@@ -143,10 +143,10 @@ noscript{position:fixed;inset:0;display:grid;place-items:center;padding:2rem;tex
     <div class="copy">
       <div class="beat" data-a="0" data-b=".12"><p class="lead">Start with the ocean.</p><p class="sub">Microplastic is in every layer of it, in pieces too small to net and too many to pick up.</p></div>
       <div class="beat" data-a=".12" data-b=".28"><p class="lead">Above it, a <em>ring</em>.</p><p class="sub">A toroidal airship. The donut shape spreads structure and lift evenly around a central hole, which is the claim for its stability.</p></div>
-      <div class="beat" data-a=".28" data-b=".46"><p class="lead">It hovers low and switches on a wide electrostatic field.</p><p class="sub">The charged particulates are drawn toward the surface and gather under the hull.</p></div>
-      <div class="beat" data-a=".46" data-b=".6"><p class="lead">Then it releases a liquid <em>film</em>.</p><p class="sub">A thin layer that cycles continuously: pumped out over the plastic, drawn back in.</p></div>
-      <div class="beat" data-a=".6" data-b=".78"><p class="lead">The film is a lens and a catalyst.</p><p class="sub">It takes ordinary sunlight and concentrates it into ultraviolet, right where the plastic sits.</p></div>
-      <div class="beat" data-a=".78" data-b=".92"><p class="lead">UV breaks the polymer chains.</p><p class="sub">Long chains split into short ones, then into simple, harmless molecules.</p></div>
+      <div class="beat" data-a=".28" data-b=".44"><p class="lead">It hovers low and builds a static charge.</p><p class="sub">The field does two jobs. First, it holds a liquid <em>film</em> in place across the centre of the ring.</p></div>
+      <div class="beat" data-a=".44" data-b=".6"><p class="lead">Second, it pulls plastic up out of the water.</p><p class="sub">Charged microplastic rises off the surface and into the film, which cycles continuously so fresh liquid keeps meeting it.</p></div>
+      <div class="beat" data-a=".6" data-b=".78"><p class="lead">The film <em>phosphoresces</em>.</p><p class="sub">It absorbs ordinary sunlight and re-emits it as specific bands of ultraviolet, the wavelengths that break plastic apart.</p></div>
+      <div class="beat" data-a=".78" data-b=".92"><p class="lead">UV breaks the polymer chains.</p><p class="sub">Inside the film, long chains split into short ones, then into simple, harmless molecules.</p></div>
       <div class="beat" data-a=".92" data-b="1.01"><p class="lead">The fish keep swimming.</p><p class="sub">That is the pitch: clean the sea without touching anything that lives in it.</p></div>
     </div>
   </div>
@@ -238,7 +238,7 @@ noscript{position:fixed;inset:0;display:grid;place-items:center;padding:2rem;tex
       <div class="beat" data-a=".18" data-b=".36"><p class="lead">Each hangs on one missing piece.</p></div>
       <div class="beat" data-a=".36" data-b=".72"><p class="lead">What each one needs.</p>
         <div class="adr">
-          <div><b style="color:rgb(80,225,200)">zeppelin</b><span>A film that makes UV at sea scale. Photocatalysis itself is real, in labs.</span></div>
+          <div><b style="color:rgb(80,225,200)">zeppelin</b><span>A film that phosphoresces sunlight into plastic-breaking UV, held by charge at sea scale. UV photocatalysis is real, in labs.</span></div>
           <div><b style="color:rgb(255,170,80)">gravitic</b><span>A thrust effect that survives in a vacuum. None has been shown.</span></div>
           <div><b style="color:rgb(110,160,255)">ion pod</b><span>Room-temperature superconductors and a megawatt power source. Ion drives themselves fly.</span></div>
           <div><b style="color:rgb(255,120,200)">whisps</b><span>Billions of self-latching micro-nodes. Modular robots exist, at much larger sizes.</span></div>
@@ -369,7 +369,7 @@ scenes.hook = (g, w, h, p, t, c) => {
 const FISH = [[.2, 22, .8], [.55, 36, 1.1], [.8, 16, .6], [.35, 48, .9]];
 scenes.zep = (g, w, h, p, t, S) => {
   const AC = C.zep, cx = w / 2, seaY = h * .5, U = Math.min(w * .2, h * .135);
-  const appear = ss(.06, .16, p), cy = lerp(h * .16, h * .26, ss(.1, .3, p));
+  const appear = ss(.06, .16, p), cy = lerp(h * .16, seaY - 1.3 * U, ss(.1, .3, p));
   if (!S.mp) S.mp = Array.from({ length: 150 }, () => ({ x: rnd(), y: rnd(), ph: rnd() * TAU, a: rnd() * TAU, cxr: rnd(), cyr: rnd(), r: 1.4 + rnd() }));
   // sea
   const sg = g.createLinearGradient(0, seaY, 0, h * .66); sg.addColorStop(0, rgba('40,120,170', .38)); sg.addColorStop(1, 'rgba(5,6,10,0)');
@@ -393,62 +393,66 @@ scenes.zep = (g, w, h, p, t, S) => {
   glow.addColorStop(0, rgba(AC, .1 * appear)); glow.addColorStop(1, rgba(AC, 0));
   g.fillStyle = glow; g.fillRect(cx - U * 2.2, cy - U * 2.2, U * 4.4, U * 4.4);
   torusWire(g, P, 1.45, .5, AC, .55 * appear);
-  // electrostatic field lines
-  const F = ss(.28, .4, p) * (1 - .6 * ss(.9, 1, p));
-  if (F > .01) {
-    g.save(); g.setLineDash([4, 7]); g.lineDashOffset = -t * 26; g.lineWidth = 1.1;
-    for (let i = -6; i <= 6; i++) {
-      const x0 = cx + i * U * .27, y0 = cy + U * .78 - Math.abs(i) * U * .02, x1 = cx + i * U * .09, y1 = seaY - 6;
-      g.strokeStyle = rgba(AC, .5 * F); g.beginPath(); g.moveTo(x0, y0);
-      g.quadraticCurveTo(x0 + i * U * .12, (y0 + y1) / 2, x1, y1); g.stroke();
+  // the film: held across the hole by the static charge
+  const hx = .95 * U, hy = hx * Math.sin(pitch), FD = ss(.3, .42, p), F = ss(.28, .4, p) * (1 - .5 * ss(.9, 1, p));
+  const G1 = ss(.44, .6, p), L = ss(.6, .72, p) * (1 - ss(.94, 1, p) * .7);
+  if (F > .01) {   // charge: arcs from the inner rim to the film edge, and a pull from the sea
+    g.save(); g.setLineDash([4, 7]); g.lineWidth = 1.1;
+    for (let i = 0; i < 12; i++) {
+      const a = i / 12 * TAU, rx = Math.cos(a), ry = Math.sin(a);
+      g.lineDashOffset = -t * 20; g.strokeStyle = rgba(AC, .5 * F);
+      g.beginPath(); g.moveTo(cx + rx * hx * 1.45, cy + ry * hy * 1.45); g.lineTo(cx + rx * hx * 1.02, cy + ry * hy * 1.02); g.stroke();
+    }
+    const pull = ss(.42, .5, p) * (1 - .6 * ss(.9, 1, p));
+    for (let i = -5; i <= 5; i++) {
+      const x0 = cx + i * U * .24, y0 = seaY - 4, x1 = cx + i * U * .09, y1 = cy + hy * .9;
+      g.lineDashOffset = t * 26; g.strokeStyle = rgba(AC, .42 * pull);
+      g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + i * U * .05, (y0 + y1) / 2, x1, y1); g.stroke();
     }
     g.restore();
   }
-  // plastic
-  const G1 = ss(.3, .5, p), D = ss(.78, .9, p), gone = ss(.88, .98, p), pieces = Math.round(S.mp.length * (1 - ss(.84, .97, p)));
+  if (FD > .01) {
+    const fg = g.createRadialGradient(cx, cy, 0, cx, cy, hx);
+    fg.addColorStop(0, rgba(AC, .1 * FD)); fg.addColorStop(1, rgba(AC, .26 * FD));
+    g.fillStyle = fg; g.beginPath(); g.ellipse(cx, cy, hx, hy, 0, 0, TAU); g.fill();
+    g.strokeStyle = rgba(AC, .8 * FD); g.lineWidth = 1.4; g.beginPath(); g.ellipse(cx, cy, hx, hy, 0, 0, TAU); g.stroke();
+    g.lineWidth = 1; g.strokeStyle = rgba(AC, .3 * FD);   // the cycling: concentric flow
+    for (let k = 1; k <= 3; k++) { g.save(); g.setLineDash([6, 10]); g.lineDashOffset = -t * 18 * (k % 2 ? 1 : -1); g.beginPath(); g.ellipse(cx, cy, hx * k / 3.4, hy * k / 3.4, 0, 0, TAU); g.stroke(); g.restore(); }
+  }
+  // plastic: rises off the surface into the film
+  const D = ss(.78, .9, p), gone = ss(.88, .98, p), pieces = Math.round(S.mp.length * (1 - ss(.84, .97, p)));
   S.mp.forEach((q, i) => {
     const bx = w * (.03 + .94 * q.x) + Math.sin(t * .4 + q.ph) * 6, by = seaY + 10 + q.y * h * .085 + Math.cos(t * .5 + q.ph) * 3;
-    const tx = cx + (q.cxr - .5) * 2.3 * U, ty = seaY - 3 - q.cyr * U * .3;
-    const gi = ss(0, 1, G1 * 1.7 - Math.abs(bx - cx) / w * 1.1), x = lerp(bx, tx, gi), y = lerp(by, ty, gi);
+    const ta = q.a, tr = Math.sqrt(q.cyr) * .8, tx = cx + Math.cos(ta) * hx * tr, ty = cy + Math.sin(ta) * hy * tr;
+    const gi = ss(0, 1, G1 * 1.7 - Math.abs(bx - cx) / w * 1.1), x = lerp(bx, tx, gi), y = lerp(by, ty, gi) - Math.sin(gi * Math.PI) * 6;
     if (D > 0 && gi > .5) {
-      const ang = q.a, sp = 5 * (1 + D * 3.5), al = (1 - gone) * .9;
+      const sp = 5 * (1 + D * 3.5), al = (1 - gone) * .9;
       for (let k = 0; k < 4; k++) {
-        const o = (k - 1.5) * sp;
-        pt(g, x + Math.cos(ang) * o, y + Math.sin(ang) * o * .5, q.r * (1 - .45 * D), rgba('255,170,120', al));
-        if (k) line(g, x + Math.cos(ang) * (o - sp), y + Math.sin(ang) * (o - sp) * .5, x + Math.cos(ang) * o, y + Math.sin(ang) * o * .5, rgba('255,170,120', al * (1 - D)));
+        const o = (k - 1.5) * sp, px = x + Math.cos(ta) * o, py = y + Math.sin(ta) * o * .5;
+        pt(g, px, py, q.r * (1 - .45 * D), rgba('255,170,120', al));
+        if (k) line(g, x + Math.cos(ta) * (o - sp), y + Math.sin(ta) * (o - sp) * .5, px, py, rgba('255,170,120', al * (1 - D)));
       }
     } else pt(g, x, y, q.r, rgba('255,170,120', .85));
   });
-  // film dome and its circulation
-  const FD = ss(.46, .58, p);
-  if (FD > .01) {
-    const dw = 1.35 * U, dh = .62 * U, dy = seaY - 2;
-    const dg = g.createLinearGradient(0, dy - dh, 0, dy); dg.addColorStop(0, rgba(AC, .02)); dg.addColorStop(1, rgba(AC, .22 * FD));
-    g.fillStyle = dg; g.beginPath(); g.ellipse(cx, dy, dw, dh, 0, Math.PI, TAU); g.fill();
-    g.strokeStyle = rgba(AC, .7 * FD); g.lineWidth = 1.3; g.beginPath(); g.ellipse(cx, dy, dw, dh, 0, Math.PI, TAU); g.stroke();
-    g.save(); g.lineWidth = 1; g.setLineDash([3, 6]);
-    for (let i = -5; i <= 5; i++) {
-      const x = cx + i * dw / 5.4, top = dy - dh * Math.sqrt(Math.max(0, 1 - ((x - cx) / dw) ** 2));
-      g.lineDashOffset = (Math.abs(i) > 3 ? 1 : -1) * t * 22;
-      g.strokeStyle = rgba(AC, .45 * FD); g.beginPath(); g.moveTo(cx + i * U * .12, cy + U * .55); g.lineTo(x, top); g.stroke();
-    }
-    g.restore();
-  }
-  // sunlight in, UV out
-  const L = ss(.6, .72, p) * (1 - ss(.95, 1, p) * .6);
+  // sunlight in, phosphoresced UV out
   if (L > .01) {
     dot(g, w * .13, h * .11, 8, C.sun, L);
-    const fx = cx, fy = seaY - 9;
-    for (let i = 0; i < 7; i++) {
-      const sx = w * .09 + i * 12, sy = h * .08 + i * 15, ex = cx + (i - 3) * U * .16;
-      const rg = g.createLinearGradient(sx, sy, ex, fy); rg.addColorStop(0, rgba(C.sun, .5 * L)); rg.addColorStop(.62, rgba(C.sun, .35 * L)); rg.addColorStop(.78, rgba(C.uv, .85 * L)); rg.addColorStop(1, rgba(C.uv, .95 * L));
-      g.strokeStyle = rg; g.lineWidth = 1.2; g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, fy - 2); g.lineTo(fx, fy); g.stroke();
+    for (let i = 0; i < 6; i++) {
+      const sx = w * .09 + i * 12, sy = h * .08 + i * 15, ex = cx + (i - 2.5) * hx * .3, ey = cy - hy * .3 + (i % 2) * hy * .2;
+      g.strokeStyle = rgba(C.sun, .45 * L); g.lineWidth = 1.2; g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, ey); g.stroke();
     }
-    const fg = g.createRadialGradient(fx, fy, 0, fx, fy, 70 * L); fg.addColorStop(0, rgba(C.uv, .55 * L * (.85 + .15 * Math.sin(t * 6)))); fg.addColorStop(1, rgba(C.uv, 0));
-    g.fillStyle = fg; g.fillRect(fx - 80, fy - 80, 160, 160);
-    txt(g, 'UV, concentrated', fx + 1.5 * U, fy - 22, { color: rgba(C.uv, .95 * L), size: 12 });
+    const glow2 = g.createRadialGradient(cx, cy, 0, cx, cy, hx * 1.1); glow2.addColorStop(0, rgba(C.uv, .5 * L * (.85 + .15 * Math.sin(t * 6)))); glow2.addColorStop(1, rgba(C.uv, 0));
+    g.fillStyle = glow2; g.beginPath(); g.ellipse(cx, cy, hx * 1.1, hy * 1.1, 0, 0, TAU); g.fill();
+    g.lineWidth = 1.3;   // narrow UV bands, each a different wavelength
+    [[.0, '210,150,255'], [.28, '150,120,255'], [-.28, '240,170,255']].forEach(([o, col], k) => {
+      g.strokeStyle = rgba(col, .85 * L); g.beginPath();
+      for (let x = -hx * .8; x <= hx * .8; x += 5) { const y = cy + o * hy + Math.sin(x * (.09 + k * .03) - t * 4 + k) * 3; x > -hx * .8 ? g.lineTo(cx + x, y) : g.moveTo(cx + x, y); }
+      g.stroke();
+    });
+    txt(g, 'sunlight in', w * .13 + 18, h * .11 + 4, { color: rgba(C.sun, .9 * L), size: 12 });
+    txt(g, 'UV bands out', cx + 2.15 * U, cy + 4, { color: rgba(C.uv, .95 * L), size: 12 });
   }
-  const stage = p < .12 ? 'open water' : p < .28 ? 'airship' : p < .46 ? 'field on' : p < .6 ? 'film out' : p < .78 ? 'sunlight to UV' : p < .92 ? 'chains breaking' : 'clear';
+  const stage = p < .12 ? 'open water' : p < .28 ? 'airship' : p < .44 ? 'charge holds film' : p < .6 ? 'plastic rising' : p < .78 ? 'film phosphoresces' : p < .92 ? 'chains breaking' : 'clear';
   readout(g, w, h, 'Zeppelin', [[stage, rgba(AC, .95)], [`plastic in view  ${pieces}`, 'rgba(215,224,250,.7)']], AC);
 };
 
