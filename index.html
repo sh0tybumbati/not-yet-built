@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not Yet Built</title>
+<meta name="description" content="A scrolling explainer on five machines nobody has built: ocean-cleaning zeppelins, electrogravitic engines, personal ion transport, haptic holograms and chip-skinned drone swarms.">
+<meta property="og:title" content="Not Yet Built">
+<meta property="og:description" content="Five machines nobody has built, taken at their word, with the missing piece marked.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{color-scheme:dark;--bg:#05060a;--ink:#dfe6ff;--dim:#8f9bbd;--ac:200,215,255}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+
+.chapter{position:relative;z-index:1;height:var(--len)}
+.chapter[data-id=hook]{--ac:200,215,255}
+.chapter[data-id=zep]{--ac:80,225,200}
+.chapter[data-id=grav]{--ac:255,170,80}
+.chapter[data-id=ion]{--ac:110,160,255}
+.chapter[data-id=whisp]{--ac:255,120,200}
+.chapter[data-id=drone]{--ac:190,255,110}
+.chapter[data-id=finale]{--ac:236,240,255}
+
+.stage{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:42%;pointer-events:none;
+  background:linear-gradient(to top,rgba(5,6,10,.96),rgba(5,6,10,.82) 45%,rgba(5,6,10,0))}
+
+.tag{position:absolute;z-index:3;top:22px;left:clamp(20px,6vw,90px);display:flex;gap:.9rem;align-items:center;
+  font:11px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:rgb(var(--ac))}
+.tag .num{opacity:.55}
+.tag .kind{padding:.45em .8em;border:1px solid rgba(var(--ac),.55);border-radius:999px;color:rgba(var(--ac),.9)}
+.tag .kind.spec{border-style:dashed}
+
+.copy{position:absolute;z-index:2;left:0;right:0;bottom:0;height:40%;padding:0 clamp(20px,6vw,90px)}
+.beat{position:absolute;left:clamp(20px,6vw,90px);bottom:clamp(22px,7vh,70px);width:min(40rem,calc(100% - 2*clamp(20px,6vw,90px)));
+  opacity:0;visibility:hidden;will-change:opacity,transform}
+.beat.right{left:auto;right:clamp(46px,6vw,90px);text-align:right}
+.beat.mid{left:50%;bottom:auto;top:4vh;margin-left:calc(min(40rem,100vw - 40px)/-2);width:min(40rem,calc(100vw - 40px));text-align:center}
+.beat.narrow{width:min(26rem,calc(100% - 2*clamp(20px,6vw,90px) - 320px))}
+.lead{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;
+  font-size:clamp(1.3rem,2.5vw,2.1rem);line-height:1.22;letter-spacing:-.01em;color:#f0f3ff}
+.lead.big{font-size:clamp(2rem,5.4vw,4rem);line-height:1.08;letter-spacing:-.02em}
+.lead em,.sub em{font-style:italic;color:rgb(var(--ac))}
+.sub{margin-top:.75em;font-size:clamp(.92rem,1.3vw,1.08rem);line-height:1.55;color:var(--dim);max-width:34rem}
+.beat.right .sub{margin-left:auto}
+.beat.mid .sub{margin-left:auto;margin-right:auto}
+
+.cue{position:absolute;z-index:3;bottom:3.2vh;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;
+  font:11px ui-monospace,Menlo,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.cue::after{content:"";width:1px;height:34px;background:linear-gradient(var(--dim),transparent);animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.adr{margin-top:1rem;padding:.8rem 1.1rem;border:1px solid rgba(236,240,255,.18);border-radius:10px;background:rgba(10,12,20,.7);
+  font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#c9d2f0;max-width:44rem}
+.adr div{display:flex;gap:1rem;padding:.28rem 0}
+.adr b{flex:0 0 6.4rem;font-weight:400;letter-spacing:.08em;text-transform:uppercase;font-size:11px;padding-top:.1em}
+
+.ctl{position:absolute;z-index:4;right:clamp(20px,6vw,90px);bottom:clamp(22px,7vh,70px);width:300px;padding:1rem 1.1rem;
+  border:1px solid rgba(110,160,255,.35);border-radius:12px;background:rgba(10,12,22,.82);backdrop-filter:blur(6px);
+  font:12px/1.4 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#c9d2f0;opacity:0;visibility:hidden}
+.ctl h3{font-weight:400;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgb(110,160,255);margin-bottom:.7rem}
+.ctl label{display:grid;grid-template-columns:5.6rem 1fr;align-items:center;gap:.3rem .6rem;margin:.45rem 0}
+.ctl label span{color:var(--dim)}
+.ctl output{grid-column:2;text-align:right;color:#fff;font-size:12px}
+.ctl input[type=range]{grid-column:1/3;width:100%;accent-color:rgb(110,160,255)}
+.ctl label.pair{grid-template-columns:5.6rem 1fr}
+.ctl select{grid-column:2;background:#0b0e1a;color:#dfe6ff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.3rem .4rem;font:inherit}
+.ctl .rd{margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.12);display:grid;grid-template-columns:1fr auto;gap:.15rem .8rem}
+.ctl .rd span{color:var(--dim)}
+.ctl .rd b{font-weight:400;color:#fff;text-align:right}
+.ctl .go{all:unset;cursor:pointer;margin-top:.7rem;padding:.55em .9em;border:1px solid rgba(110,160,255,.6);border-radius:999px;
+  letter-spacing:.1em;text-transform:uppercase;font-size:11px;color:rgb(150,185,255)}
+.ctl .go:hover,.ctl .go:focus-visible{background:rgba(110,160,255,.15);color:#fff}
+.ctl .hov{margin-top:.55rem;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.ctl .ref{margin-top:.5rem;color:var(--dim);font-size:11px}
+
+.rail{position:fixed;z-index:10;right:clamp(8px,1.5vw,22px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px}
+.rail button{all:unset;cursor:pointer;width:22px;height:22px;display:grid;place-items:center}
+.rail button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:all .3s}
+.rail button:hover::before{background:rgba(255,255,255,.6)}
+.rail button.on::before{width:11px;height:11px;background:rgb(var(--c));box-shadow:0 0 12px rgba(var(--c),.8)}
+.rail button:focus-visible{outline:1px solid rgb(var(--c));border-radius:50%}
+
+.auto{position:fixed;z-index:10;right:clamp(10px,1.6vw,24px);bottom:16px;display:flex;gap:6px;
+  font:11px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase}
+.auto button{all:unset;cursor:pointer;padding:.7em 1em;border:1px solid rgba(255,255,255,.22);border-radius:999px;
+  background:rgba(10,12,20,.72);color:#c9d2f0;backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
+.auto button:hover,.auto button:focus-visible{border-color:rgba(255,255,255,.6);color:#fff}
+.auto button.on{border-color:rgb(var(--ac,200,215,255));color:rgb(var(--ac,200,215,255))}
+@media (max-width:760px){
+  .beat.narrow{width:min(40rem,calc(100% - 2*clamp(20px,6vw,90px)))}
+  .ctl{left:12px;right:12px;width:auto;bottom:54px;padding:.7rem .9rem}
+  .ctl label{margin:.2rem 0}
+  .ctl .ref{display:none}
+  .hm{display:none}
+}
+@media (max-width:640px){
+  .auto{bottom:10px;font-size:10px}
+  .beat.right{right:auto;left:clamp(20px,6vw,90px);text-align:left}
+  .beat.right .sub{margin-left:0}
+  .adr{font-size:11px;padding:.6rem .7rem}
+  .adr b{flex-basis:4.6rem}
+  .tag{font-size:10px;gap:.6rem}
+}
+@media (prefers-reduced-motion:reduce){.cue::after{animation:none}}
+#cut{position:fixed;inset:0;z-index:9;background:var(--bg);opacity:0;pointer-events:none;transition:opacity .22s ease}
+noscript{position:fixed;inset:0;display:grid;place-items:center;padding:2rem;text-align:center;z-index:99;background:var(--bg)}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<noscript>This page is a scroll-driven animation and needs JavaScript.</noscript>
+<div id="cut"></div>
+<nav class="rail" id="rail" aria-label="Chapters"></nav>
+<div class="auto" id="auto">
+  <button id="auto-play" aria-pressed="false" title="Scroll for me (space)">▶ Auto-scroll</button>
+  <button id="auto-speed" title="Speed (+ / -)">1×</button>
+</div>
+
+<main>
+
+<section class="chapter" data-id="hook" data-name="Prologue" style="--len:300vh" aria-label="Prologue">
+  <div class="stage"><canvas></canvas>
+    <div class="cue">scroll</div>
+    <div class="copy">
+      <div class="beat mid" data-a="0" data-b=".3"><h1 class="lead big">Five machines nobody has built.</h1></div>
+      <div class="beat mid" data-a=".3" data-b=".52"><p class="lead">Each one is a good idea with a piece missing.</p></div>
+      <div class="beat" data-a=".52" data-b=".76"><p class="lead">Some are mostly <em>engineering</em>.</p><p class="sub">The physics is known. The materials are not.</p></div>
+      <div class="beat right" data-a=".76" data-b="1.01"><p class="lead">Some need <em>physics</em> we don't have.</p><p class="sub">This page takes each machine at its word, then marks what it would take.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="zep" data-name="Zeppelins" style="--len:700vh" aria-label="Electrostatic ocean-cleaning zeppelins">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">01</span><span>Ocean zeppelins</span><span class="kind spec">speculative</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".12"><p class="lead">Start with the ocean.</p><p class="sub">Microplastic is in every layer of it, in pieces too small to net and too many to pick up.</p></div>
+      <div class="beat" data-a=".12" data-b=".28"><p class="lead">Above it, a <em>ring</em>.</p><p class="sub">A toroidal airship. The donut shape spreads structure and lift evenly around a central hole, which is the claim for its stability.</p></div>
+      <div class="beat" data-a=".28" data-b=".46"><p class="lead">It hovers low and switches on a wide electrostatic field.</p><p class="sub">The charged particulates are drawn toward the surface and gather under the hull.</p></div>
+      <div class="beat" data-a=".46" data-b=".6"><p class="lead">Then it releases a liquid <em>film</em>.</p><p class="sub">A thin layer that cycles continuously: pumped out over the plastic, drawn back in.</p></div>
+      <div class="beat" data-a=".6" data-b=".78"><p class="lead">The film is a lens and a catalyst.</p><p class="sub">It takes ordinary sunlight and concentrates it into ultraviolet, right where the plastic sits.</p></div>
+      <div class="beat" data-a=".78" data-b=".92"><p class="lead">UV breaks the polymer chains.</p><p class="sub">Long chains split into short ones, then into simple, harmless molecules.</p></div>
+      <div class="beat" data-a=".92" data-b="1.01"><p class="lead">The fish keep swimming.</p><p class="sub">That is the pitch: clean the sea without touching anything that lives in it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="grav" data-name="Electrogravitic" style="--len:700vh" aria-label="Electrogravitic engines">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">02</span><span>Electrogravitic engine</span><span class="kind spec">speculative</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".12"><p class="lead">A chemical rocket throws mass out the back.</p><p class="sub">Newton's third law, paid for in propellant.</p></div>
+      <div class="beat" data-a=".12" data-b=".28"><p class="lead">The electrogravitic idea drops the exhaust.</p><p class="sub">It acts on mass and electromagnetism directly instead.</p></div>
+      <div class="beat" data-a=".28" data-b=".42"><p class="lead">At the core, a <em>ring</em> of liquid metal.</p><p class="sub">A toroidal chamber filled with a highly conductive fluid.</p></div>
+      <div class="beat" data-a=".42" data-b=".58"><p class="lead">Charge it hard. Spin it near the speed of light.</p><p class="sub">Extreme electrical charge, held in by magnetic containment fields.</p></div>
+      <div class="beat" data-a=".58" data-b=".74"><p class="lead">Huge angular momentum meets crossing electromagnetic fields.</p><p class="sub">The claim is that the interaction makes a localised gravitic <em>shear</em>.</p></div>
+      <div class="beat" data-a=".74" data-b=".88"><p class="lead">A shear that warps spacetime just enough to push one way.</p><p class="sub">Thrust in one direction. No exhaust.</p></div>
+      <div class="beat" data-a=".88" data-b="1.01"><p class="lead">Nobody has measured this.</p><p class="sub">The Biefeld–Brown effect, often cited for it, is an ion wind and vanishes in a vacuum. This is the most speculative machine here.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="ion" data-name="Ion transport" style="--len:800vh" aria-label="Personal ion-powered transportation">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">03</span><span>Personal ion transport</span><span class="kind spec">real physics, missing parts</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".1"><p class="lead">Now shrink a spacecraft engine to fit one person.</p><p class="sub">Ion propulsion already flies. It just can't lift much.</p></div>
+      <div class="beat" data-a=".1" data-b=".26"><p class="lead">The catch is <em>thrust</em>.</p><p class="sub">An ion drive pushes gently, a fraction of a newton. The bar up top shows thrust against weight. A hover needs 1.</p></div>
+      <div class="beat" data-a=".26" data-b=".4"><p class="lead">Missing piece one: superconductors at room temperature.</p><p class="sub">Huge currents with no resistance, so no heat. None has been confirmed.</p></div>
+      <div class="beat" data-a=".4" data-b=".52"><p class="lead">Missing piece two: a carbon nanotube chassis.</p><p class="sub">Strong for its weight, so the frame barely counts. Nanotube fibres exist. Chassis-sized pieces don't.</p></div>
+      <div class="beat" data-a=".52" data-b=".66"><p class="lead">Step one: <em>ionise</em>.</p><p class="sub">Electricity strips an electron from each atom of an onboard noble gas.</p></div>
+      <div class="beat" data-a=".66" data-b=".78"><p class="lead">Step two: <em>accelerate</em>.</p><p class="sub">The charged ions feel the electric field between two grids and leave out the back as plasma.</p></div>
+      <div class="beat narrow hm" data-a=".78" data-b=".93"><p class="lead">Adjust the variables.</p><p class="sub">Voltage sets how fast the ions leave. Current sets how many. See if you can find a hover.</p></div>
+      <div class="beat narrow hm" data-a=".93" data-b="1.01"><p class="lead">Quiet and continuous.</p><p class="sub">Efficient for the propellant it burns. Not for the power it draws: a hover costs megawatts.</p></div>
+    </div>
+    <div class="ctl" id="ctl">
+      <h3>Ion drive bench</h3>
+      <label class="pair"><span>Gas</span>
+        <select id="c-gas" aria-label="Propellant gas">
+          <option value="131.29">Xenon</option><option value="83.8">Krypton</option><option value="39.95">Argon</option><option value="20.18">Neon</option><option value="4.003">Helium</option>
+        </select></label>
+      <label><span>Voltage</span><output id="o-v"></output><input type="range" id="c-v" min="0" max="1000" value="500" aria-label="Accelerating voltage"></label>
+      <label><span>Beam current</span><output id="o-i"></output><input type="range" id="c-i" min="0" max="1000" value="830" aria-label="Beam current"></label>
+      <div class="rd">
+        <span>exhaust speed</span><b id="r-ve"></b>
+        <span>thrust</span><b id="r-t"></b>
+        <span>power</span><b id="r-p"></b>
+        <span>thrust : weight</span><b id="r-w"></b>
+      </div>
+      <div class="hov" id="r-h"></div>
+      <button class="go" id="c-hover">Find hover</button>
+      <div class="ref">Pod + rider: 180 kg. A flight ion thruster, NASA's NEXT, makes about 0.24 N from 7 kW.</div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="whisp" data-name="Whisps" style="--len:700vh" aria-label="Whisps, haptic holograms">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">04</span><span>Whisps</span><span class="kind spec">speculative</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".12"><p class="lead">A hologram is light. A whisp is <em>matter</em>.</p><p class="sub">One puts an image where there is nothing. The other would put something there.</p></div>
+      <div class="beat" data-a=".12" data-b=".3"><p class="lead">An ordinary hologram is only light.</p><p class="sub">Your hand goes straight through it. There is nothing to push back.</p></div>
+      <div class="beat" data-a=".3" data-b=".46"><p class="lead">Replace the light with billions of <em>nanopixels</em>.</p><p class="sub">Each is an independent micro-node with its own compute unit and a magnetic interlocking mechanism.</p></div>
+      <div class="beat" data-a=".46" data-b=".62"><p class="lead">They organise themselves in mid-air.</p><p class="sub">No mould, no assembler. Each node finds its place and latches onto its neighbours.</p></div>
+      <div class="beat" data-a=".62" data-b=".8"><p class="lead">Now the shape pushes back.</p><p class="sub">The electromagnetic bonds resist force. Press a finger in and the bonds along the load hold.</p></div>
+      <div class="beat" data-a=".8" data-b="1.01"><p class="lead">Lean on it.</p><p class="sub">A shape with mass and structural integrity, made of nothing but a swarm that agrees to hold still.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="drone" data-name="Drones" style="--len:700vh" aria-label="Advanced autonomous drones">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">05</span><span>Autonomous drones</span><span class="kind spec">mostly engineering</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".12"><p class="lead">Autonomy has two bottlenecks.</p><p class="sub">A human operator, and a central server that every decision has to travel to and from.</p></div>
+      <div class="beat" data-a=".12" data-b=".28"><p class="lead">The cost is <em>latency</em>.</p><p class="sub">Each round trip to the centre takes time. For a fast swarm, that delay is where things go wrong.</p></div>
+      <div class="beat" data-a=".28" data-b=".44"><p class="lead">So build the computer <em>into</em> the airframe.</p><p class="sub">Silicon-grade lithography, applied directly to the aerodynamic surfaces. The chassis itself becomes the processor.</p></div>
+      <div class="beat" data-a=".44" data-b=".58"><p class="lead">Every unit is a supercomputer.</p><p class="sub">With ballistic guidance on top, it can run split-second trajectory calculations on board.</p></div>
+      <div class="beat" data-a=".58" data-b=".74"><p class="lead">Now add a thousand more.</p><p class="sub">Each talks only to the ones beside it. Nothing broadcasts orders.</p></div>
+      <div class="beat" data-a=".74" data-b=".88"><p class="lead">A threat arrives. Nobody is told.</p><p class="sub">Each unit evades for itself. The swarm parts around it and closes up behind.</p></div>
+      <div class="beat" data-a=".88" data-b="1.01"><p class="lead">One fluid <em>intelligence</em>, with no one in charge.</p><p class="sub">Thousands in step, with no external command signal to lose.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" data-id="finale" data-name="Together" style="--len:420vh" aria-label="Putting it together">
+  <div class="stage"><canvas></canvas>
+    <div class="tag"><span class="num">06</span><span>Together</span></div>
+    <div class="copy">
+      <div class="beat" data-a="0" data-b=".18"><p class="lead">Five machines, five rings and swarms.</p></div>
+      <div class="beat" data-a=".18" data-b=".36"><p class="lead">Each hangs on one missing piece.</p></div>
+      <div class="beat" data-a=".36" data-b=".72"><p class="lead">What each one needs.</p>
+        <div class="adr">
+          <div><b style="color:rgb(80,225,200)">zeppelin</b><span>A film that makes UV at sea scale. Photocatalysis itself is real, in labs.</span></div>
+          <div><b style="color:rgb(255,170,80)">gravitic</b><span>A thrust effect that survives in a vacuum. None has been shown.</span></div>
+          <div><b style="color:rgb(110,160,255)">ion pod</b><span>Room-temperature superconductors and a megawatt power source. Ion drives themselves fly.</span></div>
+          <div><b style="color:rgb(255,120,200)">whisps</b><span>Billions of self-latching micro-nodes. Modular robots exist, at much larger sizes.</span></div>
+          <div><b style="color:rgb(190,255,110)">drones</b><span>Compute built into the airframe. Swarms fly. Chassis-as-computer does not.</span></div>
+        </div></div>
+      <div class="beat" data-a=".72" data-b="1.01"><p class="lead">Some are a materials problem. One is a <em>physics</em> problem.</p><p class="sub">Which is which is most of the interesting part.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(() => {
+'use strict';
+const TAU = Math.PI * 2;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const rgba = (c, a) => `rgba(${c},${a})`;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const STILL = RM || location.search.includes('still');
+const MONO = 'ui-monospace,"SF Mono",Menlo,Consolas,monospace';
+const SERIF = '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif';
+const C = { zep: '80,225,200', grav: '255,170,80', ion: '110,160,255', whisp: '255,120,200', drone: '190,255,110', white: '226,234,255', uv: '190,130,255', sun: '255,215,120', bad: '255,110,110' };
+const sup = n => String(n).replace(/-/g, '⁻').replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+const rnd = (() => { let s = 12345; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; })();
+
+// ---------- drawing helpers ----------
+function txt(g, s, x, y, o = {}) {
+  g.font = `${o.size || 12}px ${o.font || MONO}`;
+  g.textAlign = o.align || 'left';
+  g.textBaseline = o.base || 'alphabetic';
+  g.fillStyle = o.color || 'rgba(215,224,250,.8)';
+  g.fillText(s, x, y);
+}
+function line(g, x1, y1, x2, y2, col, lw = 1) {
+  g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+}
+function dot(g, x, y, r, c, a = 1) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r * 4);
+  gr.addColorStop(0, rgba(c, a)); gr.addColorStop(.25, rgba(c, a * .3)); gr.addColorStop(1, rgba(c, 0));
+  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r * 4, 0, TAU); g.fill();
+  g.fillStyle = rgba(c, a); g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+}
+function pt(g, x, y, r, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); }
+function proj(x, y, z, yaw, pitch, U, cx, cy) {
+  const c1 = Math.cos(yaw), s1 = Math.sin(yaw);
+  const x1 = x * c1 + z * s1, z1 = -x * s1 + z * c1;
+  const c2 = Math.cos(pitch), s2 = Math.sin(pitch);
+  const y1 = y * c2 - z1 * s2, z2 = y * s2 + z1 * c2;
+  const f = 1 / (1 + z2 * .1);
+  return [cx + x1 * U * f, cy - y1 * U * f, z2];
+}
+const CUBE_E = [[0,1],[1,3],[3,2],[2,0],[4,5],[5,7],[7,6],[6,4],[0,4],[1,5],[2,6],[3,7]];
+function cubeWire(g, P, s, col, a, lw = 1) {
+  const V = [];
+  for (let i = 0; i < 8; i++) V.push(P((i & 1 ? 1 : -1) * s, (i & 2 ? 1 : -1) * s, (i & 4 ? 1 : -1) * s));
+  g.strokeStyle = rgba(col, a); g.lineWidth = lw; g.beginPath();
+  for (const [i, j] of CUBE_E) { g.moveTo(V[i][0], V[i][1]); g.lineTo(V[j][0], V[j][1]); }
+  g.stroke();
+}
+function arrow(g, x1, y1, x2, y2, col, lw = 1.2) {
+  line(g, x1, y1, x2, y2, col, lw);
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  g.fillStyle = col; g.beginPath(); g.moveTo(x2, y2);
+  g.lineTo(x2 - 8 * Math.cos(a - .4), y2 - 8 * Math.sin(a - .4));
+  g.lineTo(x2 - 8 * Math.cos(a + .4), y2 - 8 * Math.sin(a + .4)); g.fill();
+}
+// torus: R = ring radius, r = tube radius, y is up
+const torusPt = (R, r, th, ph) => [(R + r * Math.cos(ph)) * Math.cos(th), r * Math.sin(ph), (R + r * Math.cos(ph)) * Math.sin(th)];
+function torusWire(g, P, R, r, col, a, nMaj = 26, nMin = 12, lw = 1) {
+  if (a <= .005) return;
+  g.strokeStyle = rgba(col, a); g.lineWidth = lw; g.beginPath();
+  for (let i = 0; i < nMaj; i++) {
+    for (let j = 0; j <= 20; j++) {
+      const q = torusPt(R, r, i / nMaj * TAU, j / 20 * TAU), s = P(q[0], q[1], q[2]);
+      j ? g.lineTo(s[0], s[1]) : g.moveTo(s[0], s[1]);
+    }
+  }
+  for (let j = 0; j < nMin; j++) {
+    for (let i = 0; i <= 64; i++) {
+      const q = torusPt(R, r, i / 64 * TAU, j / nMin * TAU), s = P(q[0], q[1], q[2]);
+      i ? g.lineTo(s[0], s[1]) : g.moveTo(s[0], s[1]);
+    }
+  }
+  g.stroke();
+}
+function readout(g, w, h, title, rows, col) {
+  if (w < 640) return;
+  const rx = w - Math.max(56, w * .06);
+  txt(g, title, rx, h * .14, { align: 'right', size: 22, font: SERIF, color: 'rgba(240,244,255,.92)' });
+  rows.forEach(([s, c], i) => txt(g, s, rx, h * .14 + 24 + i * 18, { align: 'right', color: c || rgba(col, .95) }));
+}
+const fmtP = W => W >= 1e9 ? (W / 1e9).toFixed(1) + ' GW' : W >= 1e6 ? (W / 1e6).toFixed(1) + ' MW' : W >= 1e3 ? (W / 1e3).toFixed(1) + ' kW' : W.toFixed(0) + ' W';
+const fmtT = N => N >= 100 ? N.toFixed(0) + ' N' : N >= 1 ? N.toFixed(1) + ' N' : N.toFixed(3) + ' N';
+const fmtV = V => V >= 1e3 ? (V / 1e3).toFixed(V >= 1e4 ? 0 : 1) + ' kV' : V.toFixed(0) + ' V';
+const fmtI = I => I >= 1e3 ? (I / 1e3).toFixed(I >= 1e4 ? 0 : 1) + ' kA' : I.toFixed(0) + ' A';
+
+// ---------- scenes: (g, w, h, p, t, chapter) ----------
+const scenes = {};
+
+// 0. Prologue: a ring of points, five coloured things in orbit
+scenes.hook = (g, w, h, p, t, c) => {
+  const cx = w / 2, cy = h * .36, U = Math.min(w * .2, h * .16);
+  if (c.cue) c.cue.style.opacity = 1 - ss(0, .03, p);
+  const yaw = t * .25 + p * 1.5, pitch = .6 + Math.sin(t * .2) * .08;
+  const P = (x, y, z) => proj(x, y, z, yaw, pitch, U, cx, cy);
+  if (!c.pts) c.pts = Array.from({ length: 520 }, () => ({ th: rnd() * TAU, ph: rnd() * TAU, d: rnd() }));
+  const form = ss(0, .16, p);
+  for (const q of c.pts) {
+    const k = clamp(form * 1.5 - q.d * .5), a = torusPt(1.35, .5, q.th, q.ph);
+    const x = lerp((q.d - .5) * 6, a[0], k), y = lerp(Math.sin(q.th * 3) * 2, a[1], k), z = lerp(Math.cos(q.ph * 2) * 3, a[2], k);
+    const s = P(x, y, z);
+    g.fillStyle = rgba(C.white, (.18 + .35 * k) * (.6 + .4 * clamp(.5 - s[2] * .2)));
+    g.fillRect(s[0], s[1], 1.6, 1.6);
+  }
+  const orb = ss(.22, .5, p), cols = [C.zep, C.grav, C.ion, C.whisp, C.drone];
+  cols.forEach((col, i) => {
+    const k = ss(.22 + i * .05, .4 + i * .05, p); if (k <= 0) return;
+    const a = t * (.5 - i * .06) + i * 1.26, R = (2.1 + i * .22) * (1 + 4 * (1 - k));
+    const s = P(Math.cos(a) * R, Math.sin(a * 1.3) * .7, Math.sin(a) * R);
+    dot(g, s[0], s[1], 4, col, k * orb);
+  });
+};
+
+// 1. Zeppelin: toroidal airship, electrostatic field, film, UV
+const FISH = [[.2, 22, .8], [.55, 36, 1.1], [.8, 16, .6], [.35, 48, .9]];
+scenes.zep = (g, w, h, p, t, S) => {
+  const AC = C.zep, cx = w / 2, seaY = h * .5, U = Math.min(w * .2, h * .135);
+  const appear = ss(.06, .16, p), cy = lerp(h * .16, h * .26, ss(.1, .3, p));
+  if (!S.mp) S.mp = Array.from({ length: 150 }, () => ({ x: rnd(), y: rnd(), ph: rnd() * TAU, a: rnd() * TAU, cxr: rnd(), cyr: rnd(), r: 1.4 + rnd() }));
+  // sea
+  const sg = g.createLinearGradient(0, seaY, 0, h * .66); sg.addColorStop(0, rgba('40,120,170', .38)); sg.addColorStop(1, 'rgba(5,6,10,0)');
+  g.fillStyle = sg; g.fillRect(0, seaY, w, h * .16);
+  for (let k = 0; k < 4; k++) {
+    g.strokeStyle = rgba('120,200,240', .32 - k * .06); g.lineWidth = 1; g.beginPath();
+    for (let x = 0; x <= w; x += 8) { const y = seaY + k * 9 + Math.sin(x * .018 + t * .8 + k * 1.7) * 2.4; x ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.stroke();
+  }
+  // fish
+  const fishA = .5 + .4 * ss(.9, 1, p);
+  FISH.forEach(([f, dy, sp], i) => {
+    const x = ((f * w + t * 18 * sp) % (w + 60)) - 30, y = seaY + dy + Math.sin(t + i) * 3;
+    g.fillStyle = rgba(AC, fishA * .7); g.beginPath(); g.ellipse(x, y, 9, 3.6, 0, 0, TAU); g.fill();
+    g.beginPath(); g.moveTo(x - 8, y); g.lineTo(x - 15, y - 4.5); g.lineTo(x - 15, y + 4.5); g.fill();
+  });
+  // airship
+  const yaw = t * .12, pitch = .42;
+  const P = (x, y, z) => proj(x, y, z, yaw, pitch, U, cx, cy);
+  const glow = g.createRadialGradient(cx, cy, 0, cx, cy, U * 2.1);
+  glow.addColorStop(0, rgba(AC, .1 * appear)); glow.addColorStop(1, rgba(AC, 0));
+  g.fillStyle = glow; g.fillRect(cx - U * 2.2, cy - U * 2.2, U * 4.4, U * 4.4);
+  torusWire(g, P, 1.45, .5, AC, .55 * appear);
+  // electrostatic field lines
+  const F = ss(.28, .4, p) * (1 - .6 * ss(.9, 1, p));
+  if (F > .01) {
+    g.save(); g.setLineDash([4, 7]); g.lineDashOffset = -t * 26; g.lineWidth = 1.1;
+    for (let i = -6; i <= 6; i++) {
+      const x0 = cx + i * U * .27, y0 = cy + U * .78 - Math.abs(i) * U * .02, x1 = cx + i * U * .09, y1 = seaY - 6;
+      g.strokeStyle = rgba(AC, .5 * F); g.beginPath(); g.moveTo(x0, y0);
+      g.quadraticCurveTo(x0 + i * U * .12, (y0 + y1) / 2, x1, y1); g.stroke();
+    }
+    g.restore();
+  }
+  // plastic
+  const G1 = ss(.3, .5, p), D = ss(.78, .9, p), gone = ss(.88, .98, p), pieces = Math.round(S.mp.length * (1 - ss(.84, .97, p)));
+  S.mp.forEach((q, i) => {
+    const bx = w * (.03 + .94 * q.x) + Math.sin(t * .4 + q.ph) * 6, by = seaY + 10 + q.y * h * .085 + Math.cos(t * .5 + q.ph) * 3;
+    const tx = cx + (q.cxr - .5) * 2.3 * U, ty = seaY - 3 - q.cyr * U * .3;
+    const gi = ss(0, 1, G1 * 1.7 - Math.abs(bx - cx) / w * 1.1), x = lerp(bx, tx, gi), y = lerp(by, ty, gi);
+    if (D > 0 && gi > .5) {
+      const ang = q.a, sp = 5 * (1 + D * 3.5), al = (1 - gone) * .9;
+      for (let k = 0; k < 4; k++) {
+        const o = (k - 1.5) * sp;
+        pt(g, x + Math.cos(ang) * o, y + Math.sin(ang) * o * .5, q.r * (1 - .45 * D), rgba('255,170,120', al));
+        if (k) line(g, x + Math.cos(ang) * (o - sp), y + Math.sin(ang) * (o - sp) * .5, x + Math.cos(ang) * o, y + Math.sin(ang) * o * .5, rgba('255,170,120', al * (1 - D)));
+      }
+    } else pt(g, x, y, q.r, rgba('255,170,120', .85));
+  });
+  // film dome and its circulation
+  const FD = ss(.46, .58, p);
+  if (FD > .01) {
+    const dw = 1.35 * U, dh = .62 * U, dy = seaY - 2;
+    const dg = g.createLinearGradient(0, dy - dh, 0, dy); dg.addColorStop(0, rgba(AC, .02)); dg.addColorStop(1, rgba(AC, .22 * FD));
+    g.fillStyle = dg; g.beginPath(); g.ellipse(cx, dy, dw, dh, 0, Math.PI, TAU); g.fill();
+    g.strokeStyle = rgba(AC, .7 * FD); g.lineWidth = 1.3; g.beginPath(); g.ellipse(cx, dy, dw, dh, 0, Math.PI, TAU); g.stroke();
+    g.save(); g.lineWidth = 1; g.setLineDash([3, 6]);
+    for (let i = -5; i <= 5; i++) {
+      const x = cx + i * dw / 5.4, top = dy - dh * Math.sqrt(Math.max(0, 1 - ((x - cx) / dw) ** 2));
+      g.lineDashOffset = (Math.abs(i) > 3 ? 1 : -1) * t * 22;
+      g.strokeStyle = rgba(AC, .45 * FD); g.beginPath(); g.moveTo(cx + i * U * .12, cy + U * .55); g.lineTo(x, top); g.stroke();
+    }
+    g.restore();
+  }
+  // sunlight in, UV out
+  const L = ss(.6, .72, p) * (1 - ss(.95, 1, p) * .6);
+  if (L > .01) {
+    dot(g, w * .13, h * .11, 8, C.sun, L);
+    const fx = cx, fy = seaY - 9;
+    for (let i = 0; i < 7; i++) {
+      const sx = w * .09 + i * 12, sy = h * .08 + i * 15, ex = cx + (i - 3) * U * .16;
+      const rg = g.createLinearGradient(sx, sy, ex, fy); rg.addColorStop(0, rgba(C.sun, .5 * L)); rg.addColorStop(.62, rgba(C.sun, .35 * L)); rg.addColorStop(.78, rgba(C.uv, .85 * L)); rg.addColorStop(1, rgba(C.uv, .95 * L));
+      g.strokeStyle = rg; g.lineWidth = 1.2; g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, fy - 2); g.lineTo(fx, fy); g.stroke();
+    }
+    const fg = g.createRadialGradient(fx, fy, 0, fx, fy, 70 * L); fg.addColorStop(0, rgba(C.uv, .55 * L * (.85 + .15 * Math.sin(t * 6)))); fg.addColorStop(1, rgba(C.uv, 0));
+    g.fillStyle = fg; g.fillRect(fx - 80, fy - 80, 160, 160);
+    txt(g, 'UV, concentrated', fx + 1.5 * U, fy - 22, { color: rgba(C.uv, .95 * L), size: 12 });
+  }
+  const stage = p < .12 ? 'open water' : p < .28 ? 'airship' : p < .46 ? 'field on' : p < .6 ? 'film out' : p < .78 ? 'sunlight to UV' : p < .92 ? 'chains breaking' : 'clear';
+  readout(g, w, h, 'Zeppelin', [[stage, rgba(AC, .95)], [`plastic in view  ${pieces}`, 'rgba(215,224,250,.7)']], AC);
+};
+
+// 2. Electrogravitic: liquid metal torus, spin, shear
+scenes.grav = (g, w, h, p, t, S) => {
+  const AC = C.grav, cx = w / 2, cy = h * .33, U = Math.min(w * .15, h * .11);
+  if (!S.lm) S.lm = Array.from({ length: 110 }, () => ({ th: rnd() * TAU, ph: rnd() * TAU, d: rnd() }));
+  if (S.lt == null) { S.lt = t; S.ang = 0; }
+  const spin = ss(.42, .6, p), om = lerp(.35, 9, spin * spin);
+  S.ang += clamp(t - S.lt, 0, .05) * om; S.lt = t;
+  const roc = 1 - ss(.08, .16, p);
+  // rocket
+  if (roc > .01) {
+    const rx = cx + 30, ry = cy;
+    g.save(); g.globalAlpha = roc;
+    g.fillStyle = 'rgba(210,220,245,.85)'; g.beginPath(); g.moveTo(rx + 70, ry); g.quadraticCurveTo(rx + 30, ry - 20, rx - 30, ry - 16); g.lineTo(rx - 30, ry + 16); g.quadraticCurveTo(rx + 30, ry + 20, rx + 70, ry); g.fill();
+    g.fillStyle = rgba(AC, .8); g.beginPath(); g.moveTo(rx - 30, ry - 16); g.lineTo(rx - 52, ry - 30); g.lineTo(rx - 40, ry); g.lineTo(rx - 52, ry + 30); g.lineTo(rx - 30, ry + 16); g.fill();
+    for (let k = 0; k < 46; k++) {
+      const u = (k / 46 + t * 1.6) % 1, x = rx - 56 - u * 150, y = ry + Math.sin(k * 12.9) * (4 + u * 26);
+      pt(g, x, y, 3 * (1 - u) + .6, rgba(k % 3 ? '255,180,90' : '255,235,170', (1 - u) * .85));
+    }
+    arrow(g, rx - 90, ry - 46, rx - 180, ry - 46, rgba(AC, .8)); txt(g, 'mass out', rx - 135, ry - 56, { align: 'center', color: rgba(AC, .9) });
+    arrow(g, rx + 10, ry + 46, rx + 100, ry + 46, 'rgba(226,234,255,.8)'); txt(g, 'thrust', rx + 55, ry + 66, { align: 'center', color: 'rgba(226,234,255,.8)' });
+    g.restore();
+  }
+  const T = ss(.1, .2, p); if (T <= .01) return;
+  const shear = ss(.6, .74, p), go = ss(.76, .88, p);
+  const yaw = -.5 + Math.sin(t * .2) * .12, pitch = lerp(.95, .72, shear);
+  const P = (x, y, z) => proj(x, y, z, yaw, pitch, U, cx, cy);
+  // spacetime grid with a one-sided slope
+  if (shear > .01) {
+    const Y0 = -2.35;
+    g.strokeStyle = rgba(AC, .3 * shear); g.lineWidth = 1;
+    const dy = (x, z) => -1.1 * shear * (x + .2) * Math.exp(-(x * x + z * z) / 3.4);
+    for (let k = -6; k <= 6; k++) {
+      const v = k * .5; g.beginPath();
+      for (let s = -3; s <= 3; s += .25) { const q = P(s, Y0 + dy(s, v), v); s > -3 ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); } g.stroke();
+      g.beginPath();
+      for (let s = -3; s <= 3; s += .25) { const q = P(v, Y0 + dy(v, s), s); s > -3 ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); } g.stroke();
+    }
+  }
+  // magnetic containment loops
+  const MC = ss(.46, .58, p);
+  if (MC > .01) {
+    for (const rr of [1.45 - .95, 1.45 + .95]) {
+      g.strokeStyle = rgba(C.ion, .55 * MC); g.lineWidth = 1.3; g.beginPath();
+      for (let i = 0; i <= 72; i++) { const s = P(Math.cos(i / 72 * TAU) * rr, 0, Math.sin(i / 72 * TAU) * rr); i ? g.lineTo(s[0], s[1]) : g.moveTo(s[0], s[1]); }
+      g.stroke();
+    }
+  }
+  torusWire(g, P, 1.45, .5, AC, .42 * T, 24, 10);
+  // liquid metal
+  const hot = .35 + .65 * spin;
+  for (const q of S.lm) {
+    const th = q.th + S.ang, rho = .1 + q.d * .34;
+    const a = torusPt(1.45, rho, th, q.ph), s = P(a[0], a[1], a[2]);
+    const tail = clamp(spin * .5 + .02), b = torusPt(1.45, rho, th - tail, q.ph), s2 = P(b[0], b[1], b[2]);
+    if (spin > .08) line(g, s[0], s[1], s2[0], s2[1], rgba('255,215,160', .5 * hot), 1.2);
+    pt(g, s[0], s[1], 1.7, rgba(spin > .1 ? '255,225,180' : '200,210,225', .5 + .5 * hot));
+  }
+  // charge: radial field ticks
+  const CH = ss(.42, .54, p);
+  if (CH > .01) {
+    for (let i = 0; i < 12; i++) {
+      const th = i / 12 * TAU + S.ang * .2, a = torusPt(1.45, .55, th, 0), b = torusPt(1.45, .55 + .38 * CH, th, 0);
+      const s1 = P(a[0], a[1], a[2]), s2 = P(b[0], b[1], b[2]);
+      line(g, s1[0], s1[1], s2[0], s2[1], rgba('255,240,200', .6 * CH * (.6 + .4 * Math.sin(t * 5 + i))), 1.3);
+    }
+    txt(g, '+ + +', cx, cy - U * 2.45, { align: 'center', color: rgba('255,240,200', .8 * CH), size: 13 });
+  }
+  // thrust, with nothing coming out of the back
+  if (go > .01) {
+    const x0 = cx + U * 2.3 + 10;
+    arrow(g, x0, cy, x0 + U * 1.1 * go + 10, cy, rgba(AC, .95), 2.2);
+    txt(g, 'thrust', x0 + U * .6, cy - 14, { color: rgba(AC, .95 * go) });
+    txt(g, 'no exhaust', cx - U * 2.4, cy + 4, { align: 'right', color: 'rgba(226,234,255,.7)' });
+    g.strokeStyle = 'rgba(226,234,255,.5)'; g.beginPath(); g.moveTo(cx - U * 2.4 + 8, cy - 8); g.lineTo(cx - U * 2.4 + 20, cy + 8); g.moveTo(cx - U * 2.4 + 20, cy - 8); g.lineTo(cx - U * 2.4 + 8, cy + 8); g.stroke();
+    g.strokeStyle = rgba('226,234,255', .22 * go); g.lineWidth = 1;
+    for (let k = 0; k < 14; k++) {
+      const y = h * .08 + (k * 53 % 100) / 100 * h * .46, sp = 160 + (k * 37 % 90), x = w - ((t * sp + k * 97) % (w + 80)) + 20;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + 40 + (k % 3) * 20, y); g.stroke();
+    }
+  }
+  const vc = spin * .92;
+  readout(g, w, h, 'Engine', [[`ring speed  ${vc.toFixed(2)} c`, rgba(AC, .95)], [shear > .5 ? 'gravitic shear: claimed' : 'no shear yet', 'rgba(215,224,250,.7)']], AC);
+};
+
+// 3. Ion transport: ionise, accelerate, and a real bench
+const Q = 1.602176634e-19, AMU = 1.66053907e-27, BODY = 180 * 9.81;
+const ctl = { el: document.getElementById('ctl'), gas: document.getElementById('c-gas'), v: document.getElementById('c-v'), i: document.getElementById('c-i') };
+function phys() {
+  const V = Math.pow(10, 2 + 3 * ctl.v.value / 1000), I = Math.pow(10, 1 + 4 * ctl.i.value / 1000), m = +ctl.gas.value * AMU;
+  const ve = Math.sqrt(2 * Q * V / m), T = I * m / Q * ve;
+  return { V, I, ve, T, P: I * V, r: T / BODY };
+}
+function ctlUpdate() {
+  const f = phys();
+  document.getElementById('o-v').textContent = fmtV(f.V); document.getElementById('o-i').textContent = fmtI(f.I);
+  document.getElementById('r-ve').textContent = (f.ve / 1e3).toFixed(f.ve > 1e5 ? 0 : 1) + ' km/s';
+  document.getElementById('r-t').textContent = fmtT(f.T); document.getElementById('r-p').textContent = fmtP(f.P);
+  document.getElementById('r-w').textContent = f.r < .01 ? f.r.toExponential(1) : f.r.toFixed(2);
+  const hv = document.getElementById('r-h');
+  hv.textContent = f.r >= 1 ? 'lifting off' : f.r >= .5 ? 'close, not enough' : 'stays on the ground';
+  hv.style.color = f.r >= 1 ? 'rgb(150,255,190)' : 'rgb(255,190,120)';
+}
+['input', 'change'].forEach(e => [ctl.gas, ctl.v, ctl.i].forEach(el => el.addEventListener(e, ctlUpdate)));
+document.getElementById('c-hover').onclick = () => {
+  const m = +ctl.gas.value * AMU, V = Math.pow(10, 2 + 3 * ctl.v.value / 1000);
+  const I = 1.06 * BODY / (m / Q * Math.sqrt(2 * Q * V / m)), s = (Math.log10(I) - 1) / 4 * 1000;
+  ctl.i.value = clamp(s, 0, 1000); ctlUpdate();
+};
+ctlUpdate();
+const ctlHit = ['pointerdown', 'touchstart', 'keydown'];
+scenes.ion = (g, w, h, p, t, S) => {
+  const AC = C.ion, cx = w * .42, groundY = h * .5, s = Math.min(h * .09, w * .1);
+  if (S.alt == null) { S.alt = .3; S.vel = 0; S.lt = t; S.ph = Array.from({ length: 90 }, () => rnd()); }
+  const dt = clamp(t - S.lt, 0, .05); S.lt = t;
+  const f = phys(), live = ss(.76, .8, p), sim = p > .76;
+  if (sim) {
+    const acc = clamp((f.r - 1) * .6, -.6, 3);
+    S.vel = clamp(S.vel * (1 - 1.2 * dt) + acc * dt, -.5, .7); S.alt += S.vel * dt;
+    if (S.alt <= 0) { S.alt = 0; S.vel = Math.max(0, S.vel); }
+    if (S.alt >= 1) { S.alt = 1; S.vel = Math.min(0, S.vel); }
+  } else { S.alt = .3 + Math.sin(t * .8) * .02; S.vel = 0; }
+  ctl.el.style.opacity = live.toFixed(3); ctl.el.style.visibility = live < .01 ? 'hidden' : 'visible';
+  const range = h * .17, ny = groundY - 12 - S.alt * range;       // nozzle exit
+  const colH = 1.9 * s, topY = ny - colH, platY = topY - .25 * s;
+  const appear = ss(.0, .08, p);
+  // ground
+  line(g, 0, groundY, w, groundY, rgba('200,215,255', .3), 1.2);
+  for (let x = -((t * 0) % 40); x < w; x += 40) line(g, x, groundY, x - 14, groundY + 8, rgba('200,215,255', .14));
+  // thruster column
+  g.save(); g.globalAlpha = appear;
+  g.strokeStyle = rgba(AC, .8); g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(cx - .42 * s, topY); g.lineTo(cx - .42 * s, ny - .45 * s); g.lineTo(cx - .62 * s, ny); g.moveTo(cx + .42 * s, topY); g.lineTo(cx + .42 * s, ny - .45 * s); g.lineTo(cx + .62 * s, ny); g.stroke();
+  // platform + rider
+  g.fillStyle = 'rgba(14,18,34,.9)'; g.strokeStyle = rgba(AC, .85); g.beginPath(); g.ellipse(cx, platY, 1.5 * s, .26 * s, 0, 0, TAU); g.fill(); g.stroke();
+  g.strokeStyle = 'rgba(226,234,255,.8)'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(cx, platY - .2 * s); g.lineTo(cx, platY - 1.15 * s); g.moveTo(cx - .45 * s, platY - .65 * s); g.lineTo(cx + .45 * s, platY - .65 * s); g.moveTo(cx, platY - 1.15 * s); g.stroke();
+  g.fillStyle = 'rgba(226,234,255,.85)'; g.beginPath(); g.arc(cx, platY - 1.4 * s, .24 * s, 0, TAU); g.fill();
+  // gas tank, ioniser coil, grids
+  g.strokeStyle = rgba('200,215,255', .5); g.lineWidth = 1.2; g.strokeRect(cx - .3 * s, topY + .1 * s, .6 * s, .32 * s);
+  txt(g, 'gas', cx, topY + .33 * s, { align: 'center', size: 9, color: 'rgba(200,215,255,.7)' });
+  const SC = ss(.26, .4, p), coilY = topY + .75 * s;
+  for (let k = 0; k < 4; k++) {
+    const y = coilY + k * .13 * s, hotc = SC > .01 ? '120,255,190' : C.grav;
+    g.strokeStyle = rgba(SC > .01 ? hotc : '200,215,255', SC > .01 ? .85 : .45); g.lineWidth = 1.6; g.beginPath(); g.ellipse(cx, y, .5 * s, .09 * s, 0, 0, TAU); g.stroke();
+    if (SC > .01) { const a = (t * 2 + k * .9) % TAU; pt(g, cx + Math.cos(a) * .5 * s, y + Math.sin(a) * .09 * s, 2.2, rgba('180,255,220', .95)); }
+  }
+  const g1 = ny - .85 * s, g2 = ny - .62 * s;
+  g.strokeStyle = rgba(AC, .95); g.lineWidth = 2; line(g, cx - .4 * s, g1, cx + .4 * s, g1, rgba(AC, .95), 2); line(g, cx - .4 * s, g2, cx + .4 * s, g2, rgba(AC, .95), 2);
+  txt(g, '+', cx - .55 * s, g1 + 4, { align: 'center', size: 12, color: rgba(AC, .95) }); txt(g, '−', cx - .55 * s, g2 + 4, { align: 'center', size: 12, color: rgba(AC, .95) });
+  const FA = ss(.64, .72, p);
+  if (FA > .01) for (let k = -1; k <= 1; k++) arrow(g, cx + k * .22 * s, g1 + 3, cx + k * .22 * s, g2 - 3, rgba(AC, .8 * FA), 1.1);
+  // hex lattice on the platform
+  const HX = ss(.38, .46, p) * (1 - ss(.5, .54, p) * .5);
+  if (HX > .01) {
+    g.strokeStyle = rgba('180,200,255', .6 * HX); g.lineWidth = 1;
+    for (let r = -1; r <= 1; r++) for (let q = -4; q <= 4; q++) {
+      const x = cx + (q + (r & 1 ? .5 : 0)) * .34 * s, y = platY + r * .11 * s; if (Math.abs(x - cx) > 1.4 * s) continue;
+      g.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; k ? g.lineTo(x + Math.cos(a) * .17 * s, y + Math.sin(a) * .06 * s) : g.moveTo(x + Math.cos(a) * .17 * s, y + Math.sin(a) * .06 * s); } g.closePath(); g.stroke();
+    }
+    txt(g, w < 640 ? 'nanotube chassis' : 'carbon nanotube chassis', w < 640 ? cx : cx + 1.8 * s, w < 640 ? platY + .55 * s : platY - .1 * s, { align: w < 640 ? 'center' : 'left', color: rgba('180,200,255', .9 * HX), size: 12 });
+  }
+  g.restore();
+  // superconductor vs copper
+  const SCc = SC * (1 - ss(.46, .52, p));
+  if (SCc > .01) {
+    const sx = Math.min(w * .17, 190), y0 = h * .27, d = Math.min(1, w / 700);
+    const coil = (x, hotc) => { for (let k = 0; k < 5; k++) { g.strokeStyle = rgba(hotc, .8 * SCc); g.lineWidth = 1.5; g.beginPath(); g.ellipse(x, y0 + k * 9, 26 * d, 6 * d, 0, 0, TAU); g.stroke(); } };
+    const xl = cx - sx * 1.7, xr = cx + sx * 1.7;
+    if (xl > 60) {
+      coil(xl, '255,120,90'); g.strokeStyle = rgba('255,120,90', .6 * SCc); g.lineWidth = 1.2;
+      for (let k = -2; k <= 2; k++) { g.beginPath(); for (let j = 0; j <= 14; j++) { const y = y0 - 8 - j * 3.2; const x = xl + k * 11 + Math.sin(j * .9 + t * 5 + k) * 3; j ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+      txt(g, 'copper: heat', xl, y0 + 64, { align: 'center', color: rgba('255,150,120', .9 * SCc), size: 12 });
+    }
+    if (xr < w - 60) {
+      coil(xr, '120,255,190');
+      for (let k = 0; k < 5; k++) { const a = (t * 2.5 + k) % TAU; pt(g, xr + Math.cos(a) * 26 * d, y0 + k * 9 + Math.sin(a) * 6 * d, 2, rgba('180,255,220', SCc)); }
+      txt(g, 'superconductor: none', xr, y0 + 64, { align: 'center', color: rgba('150,255,200', .9 * SCc), size: 12 });
+    }
+  }
+  // gas, ions and plasma
+  const gate = ss(.5, .58, p), N = Math.round(14 + (ctlI01() * 62)) , norm = clamp((Math.log10(f.ve) - 3.8) / 2.6), rate = .16 + .55 * norm;
+  const L = ny - topY - .2 * s + (groundY - ny);
+  for (let i = 0; i < N; i++) {
+    const ph = (i / N + t * rate) % 1, u = S.ph[i % S.ph.length];
+    const y = topY + .45 * s + Math.pow(ph, 2.1) * (L + (groundY - (topY + .45 * s)) * 0);
+    const yy = Math.min(groundY - 1, y), spread = (u - .5) * (.3 * s + (ph > .5 ? (ph - .5) * 1.1 * s : 0));
+    const ion = yy > coilY + .3 * s, a = gate * (ph < .05 ? ph / .05 : 1);
+    if (a <= .01) continue;
+    if (ion) { pt(g, cx + spread * .9, yy, 1.9, rgba(AC, .95 * a)); if (ph < .35) line(g, cx + spread * .9, yy, cx + spread * .9, yy - 6 - ph * 10, rgba(AC, .4 * a), 1.2); }
+    else pt(g, cx + (u - .5) * .5 * s, yy, 1.7, rgba('200,210,225', .8 * a));
+    if (Math.abs(yy - (coilY + .3 * s)) < 3 && gate > .5) { const e = (t * 3 + i) % 1; pt(g, cx + (u > .5 ? 1 : -1) * (.5 + e * .5) * s, yy - e * 8, 1.2, rgba('150,255,210', (1 - e) * a)); }
+  }
+  if (gate > .01) {
+    const pg = g.createRadialGradient(cx, groundY, 0, cx, groundY, 1.8 * s * (.6 + .8 * norm)); pg.addColorStop(0, rgba(AC, .35 * gate)); pg.addColorStop(1, rgba(AC, 0));
+    g.fillStyle = pg; g.fillRect(cx - 3 * s, groundY - 2 * s, 6 * s, 2 * s);
+  }
+  if (p > .52 && p < .8) {
+    const lab = p < .66 ? ['1  ionise', coilY] : ['2  accelerate', (g1 + g2) / 2], a = p < .66 ? ss(.52, .56, p) * (1 - ss(.64, .66, p)) : ss(.66, .7, p) * (1 - ss(.78, .8, p));
+    line(g, cx + .6 * s, lab[1], cx + 1.35 * s, lab[1], rgba(AC, .7 * a)); txt(g, lab[0], cx + 1.45 * s, lab[1] + 4, { color: rgba(AC, .95 * a), size: 12 });
+  }
+  // thrust : weight meter
+  const mx = Math.max(20, w * .06), mw = Math.min(w * .42, 380), my = h * .14, ms = ss(.1, .16, p);
+  if (ms > .01) {
+    const lv = lerp(Math.log10(2e-5), Math.log10(f.r), ss(.5, .62, p)), pos = clamp((lv + 5) / 6);
+    g.save(); g.globalAlpha = ms;
+    g.fillStyle = 'rgba(200,215,255,.1)'; g.fillRect(mx, my, mw, 8);
+    g.fillStyle = rgba(AC, .9); g.fillRect(mx, my, Math.max(2, mw * pos), 8);
+    for (let k = -5; k <= 1; k++) { const x = mx + (k + 5) / 6 * mw; line(g, x, my - 3, x, my + 11, rgba('200,215,255', k === 0 ? .9 : .3)); if (k % 2 || k === 0) txt(g, '10' + sup(k), x, my + 26, { align: 'center', size: 10, color: 'rgba(160,172,205,.8)' }); }
+    txt(g, (w < 640 ? 'T:W  ' : 'thrust : weight   ') + (lv < -2 ? (10 ** lv).toExponential(1) : (10 ** lv).toFixed(2)), mx, my - 12, { size: 11, color: 'rgba(200,215,255,.85)' });
+    txt(g, 'hover', mx + 5 / 6 * mw, my - 12, { align: 'center', size: 11, color: 'rgba(150,255,190,.9)' });
+        g.restore();
+  }
+};
+function ctlI01() { return ctl.i.value / 1000; }
+
+// 4. Whisps: light, then nodes, then a solid shape
+const VOX = (() => {
+  const v = [];
+  for (const [i, k] of [[0, 0], [4, 0], [0, 4], [4, 4]]) for (let j = 0; j < 3; j++) v.push([i, j, k]);
+  for (let i = 0; i < 5; i++) for (let k = 0; k < 5; k++) v.push([i, 3, k]);
+  for (let i = 0; i < 5; i++) for (let j = 4; j < 9; j++) v.push([i, j, 0]);
+  return v;
+})();
+const VP = (() => {
+  const a = [];
+  VOX.forEach(([i, j, k], vi) => { for (let d = 0; d < 8; d++) a.push({ v: vi, x: (i - 2) * .5 + (d & 1 ? .12 : -.12), y: (j - 4) * .5 + (d & 2 ? .12 : -.12), z: (k - 2) * .5 + (d & 4 ? .12 : -.12), cx: (i - 2) * .5, cz: (k - 2) * .5, cy: (j - 4) * .5 }); });
+  return a;
+})();
+const VB = (() => { const b = [], m = new Map(VOX.map((q, i) => [q.join(','), i])); VOX.forEach(([i, j, k], a) => { for (const [x, y, z] of [[1, 0, 0], [0, 1, 0], [0, 0, 1]]) { const o = m.get([i + x, j + y, k + z].join(',')); if (o != null) b.push([a, o]); } }); return b; })();
+scenes.whisp = (g, w, h, p, t, S) => {
+  const AC = C.whisp, cx = w / 2, cy = h * .3, U = Math.min(h * .062, w * .09);
+  if (!S.cl) S.cl = VP.map(() => ({ x: (rnd() - .5) * 7, y: (rnd() - .5) * 4.5, z: (rnd() - .5) * 5, o: rnd(), ph: rnd() * TAU }));
+  const yaw = -.55 + Math.sin(t * .25) * .35, pitch = .28;
+  const P = (x, y, z) => proj(x, y, z, yaw, pitch, U, cx, cy);
+  const holo = ss(.1, .16, p) * (1 - ss(.3, .36, p)), cloud = ss(.3, .38, p), node = ss(.34, .4, p) * (1 - ss(.5, .56, p)), asm = ss(.5, .66, p);
+  const press = ss(.64, .7, p) * (1 - ss(.76, .8, p)), drop = ss(.8, .88, p);
+  // deformation
+  const pr = [0, -.5 + .25 + .22, 0];
+  const bally = lerp(2.4, .1, drop * drop) + Math.abs(Math.sin(drop * 9)) * .5 * (1 - drop) * (drop > 0 ? 1 : 0);
+  const ballRest = ss(.86, .9, p), load = Math.max(press, ballRest * .8);
+  const defl = (q) => { const d = Math.hypot(q.cx - pr[0], q.cz - pr[2]); return q.cy > -.7 && q.cy < -.3 ? -.14 * load * Math.exp(-d * d / .7) : 0; };
+  const cur = VP.map((q, i) => {
+    const c = S.cl[i], k = ss(0, 1, asm * 1.7 - c.o * .7);
+    const hx = q.x, hy = q.y, hz = q.z;
+    const sx = c.x + Math.sin(t * .6 + c.ph) * .15, sy = c.y + Math.cos(t * .5 + c.ph) * .15, sz = c.z + Math.sin(t * .4 + c.ph * 2) * .15;
+    return [lerp(sx, hx, k), lerp(sy, hy, k) + defl(q) * k, lerp(sz, hz, k), k];
+  });
+  // projector cone + light chair
+  if (holo > .01) {
+    const bx = cx, by = h * .5, a = holo;
+    const cg = g.createLinearGradient(0, by, 0, cy - U * 2); cg.addColorStop(0, rgba(AC, .22 * a)); cg.addColorStop(1, rgba(AC, 0));
+    g.fillStyle = cg; g.beginPath(); g.moveTo(bx - 14, by); g.lineTo(bx + 14, by); g.lineTo(bx + U * 2, cy - U * 2.4); g.lineTo(bx - U * 2, cy - U * 2.4); g.fill();
+    g.fillStyle = 'rgba(30,24,40,.9)'; g.fillRect(bx - 22, by, 44, 6);
+    g.strokeStyle = rgba(AC, .6 * a); g.lineWidth = 1; g.beginPath();
+    for (const [a1, b1] of VB) { const A = VP[a1 * 8], B = VP[b1 * 8], s1 = P(A.cx, A.cy, A.cz), s2 = P(B.cx, B.cy, B.cz); g.moveTo(s1[0], s1[1]); g.lineTo(s2[0], s2[1]); }
+    g.stroke();
+    for (let k = 0; k < VOX.length; k++) { const A = VP[k * 8], s = P(A.cx, A.cy, A.cz); pt(g, s[0], s[1], 1.8, rgba(AC, .7 * a * (.7 + .3 * Math.sin(t * 6 + k)))); }
+    // a finger passes straight through
+    const fx = lerp(w * 1.05, -w * .1, ss(.16, .3, p)), fy = cy + U * .5;
+    const fa = ss(.13, .17, p) * (1 - ss(.29, .31, p));
+    g.strokeStyle = rgba('226,234,255', .8 * fa); g.lineWidth = 10; g.lineCap = 'round'; g.beginPath(); g.moveTo(fx + 220, fy + 20); g.lineTo(fx, fy); g.stroke(); g.lineCap = 'butt';
+    txt(g, 'just light', cx, by + 26, { align: 'center', color: rgba(AC, .9 * a) });
+  }
+  // nanopixels
+  const drawN = (order) => {
+    const arr = cur.map((c, i) => { const s = P(c[0], c[1], c[2]); return [s, c[3], i, c[2]]; });
+    return arr;
+  };
+  if (cloud > .01) {
+    // bonds on assembled voxels
+    if (asm > .9) {
+      g.lineWidth = 1;
+      for (const [a1, b1] of VB) {
+        const A = cur[a1 * 8 + 7], B = cur[b1 * 8], s1 = P(A[0], A[1], A[2]), s2 = P(B[0], B[1], B[2]);
+        const d = Math.hypot(VP[a1 * 8].cx - pr[0], VP[a1 * 8].cz - pr[2]) * 1, st = load * Math.exp(-d * d / 1.2);
+        g.strokeStyle = st > .08 ? rgba('255,230,160', .25 + .6 * st) : rgba(AC, .18); g.beginPath(); g.moveTo(s1[0], s1[1]); g.lineTo(s2[0], s2[1]); g.stroke();
+      }
+    }
+    const order = cur.map((c, i) => ({ s: P(c[0], c[1], c[2]), k: c[3], i })).sort((a, b) => b.s[2] - a.s[2]);
+    for (const o of order) {
+      const al = cloud * (.35 + .65 * o.k) * (1 - .6 * node * (1 - o.k));
+      const warm = VP[o.i].cy > -.7 && VP[o.i].cy < -.3 && load > .1 ? load * Math.exp(-(Math.hypot(VP[o.i].cx - pr[0], VP[o.i].cz - pr[2]) ** 2) / 1.2) : 0;
+      g.fillStyle = warm > .12 ? rgba('255,235,170', al) : rgba(AC, al); g.fillRect(o.s[0] - 1.1, o.s[1] - 1.1, 2.2 + o.k * .4, 2.2 + o.k * .4);
+    }
+  }
+  // finger pressing the seat
+  if (press > .01) {
+    const top = P(pr[0], -.5 + .25 + .04 - .14 * press + .0, pr[2]);
+    g.strokeStyle = rgba('226,234,255', .85); g.lineWidth = 10; g.lineCap = 'round'; g.beginPath(); g.moveTo(top[0] + 40, top[1] - 160); g.lineTo(top[0], top[1] - 8 + 0); g.stroke(); g.lineCap = 'butt';
+    arrow(g, top[0] + 70, top[1] + 14, top[0] + 16, top[1] + 14, rgba('255,235,170', .7 * press));
+    txt(g, 'bonds hold', top[0] + 80, top[1] + 18, { color: rgba('255,235,170', .9 * press), size: 12 });
+  }
+  // ball resting on the seat
+  if (drop > .01) {
+    const b = P(0, -.25 + .3 + (bally - .1) - .14 * ballRest * .8, 0), br = U * .32;
+    const gr = g.createRadialGradient(b[0] - br * .3, b[1] - br * .3, 0, b[0], b[1], br);
+    gr.addColorStop(0, 'rgb(255,250,235)'); gr.addColorStop(1, 'rgb(190,150,120)');
+    g.fillStyle = gr; g.beginPath(); g.arc(b[0], b[1], br, 0, TAU); g.fill();
+    if (ballRest > .5) txt(g, 'it holds', b[0] + br + 12, b[1] + 4, { color: rgba(AC, .95 * ballRest), size: 12 });
+  }
+  // one node, enlarged
+  if (node > .01) {
+    const nx = w * .5, ny = h * .27, NU = Math.min(h * .08, w * .1), P2 = (x, y, z) => proj(x, y, z, t * .6, .5, NU, nx, ny);
+    g.fillStyle = `rgba(8,6,14,${.72 * node})`; g.fillRect(nx - NU * 3.2, ny - NU * 1.9, NU * 6.4, NU * 3.8);
+    cubeWire(g, P2, 1, AC, .85 * node, 1.4); cubeWire(g, P2, .38, '255,240,250', .9 * node, 1.2);
+    for (const [x, y, z] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+      const a = P2(x * 1.03, y * 1.03, z * 1.03), b = P2(x * 1.4, y * 1.4, z * 1.4);
+      line(g, a[0], a[1], b[0], b[1], rgba(AC, .7 * node), 2); dot(g, b[0], b[1], 2.4, '255,200,235', node * (.7 + .3 * Math.sin(t * 5 + x + y * 2)));
+    }
+    const core = P2(0, 0, 0); pt(g, core[0], core[1], 3, rgba('255,245,252', node));
+    line(g, core[0] + 6, core[1], nx + NU * 2.2, ny - NU * .9, rgba('226,234,255', .5 * node)); txt(g, 'compute unit', nx + NU * 2.25, ny - NU * .9 + 4, { color: rgba('226,234,255', .85 * node), size: 12 });
+    const lt = P2(1.4, 0, 0); line(g, lt[0], lt[1], nx + NU * 2.2, ny + NU * .9, rgba(AC, .5 * node)); txt(g, 'magnetic latch', nx + NU * 2.25, ny + NU * .9 + 4, { color: rgba(AC, .95 * node), size: 12 });
+  }
+  readout(g, w, h, 'Whisps', [[`nodes drawn  ${cloud > .01 ? VP.length : 0}`, rgba(AC, .95)], ['a real chair: billions', 'rgba(215,224,250,.7)']], AC);
+};
+
+// 5. Drones: hub and spokes, chassis as computer, then the swarm
+const TRACE = (() => {
+  const a = [];
+  for (let k = 0; k < 46; k++) {
+    let x = (rnd() - .5) * 2.6, y = -1.5 + rnd() * 2.4, hz = rnd() < .5; const pts = [[x, y]];
+    for (let j = 0; j < 3; j++) { const l = (.2 + rnd() * .5) * (rnd() < .5 ? -1 : 1); hz ? x += l : y += l; hz = !hz; pts.push([x, y]); }
+    a.push(pts);
+  }
+  return a;
+})();
+const along = (pts, u) => {
+  let L = 0; const seg = []; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+  let r = u * L; for (let i = 0; i < seg.length; i++) { if (r <= seg[i]) { const k = r / seg[i]; return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k)]; } r -= seg[i]; }
+  return pts[pts.length - 1];
+};
+scenes.drone = (g, w, h, p, t, S) => {
+  const AC = C.drone, cx = w / 2, cy = h * .3;
+  // hub and spokes
+  const hub = (1 - ss(.2, .3, p)), ch = ss(.26, .34, p) * (1 - ss(.56, .62, p)), sw = ss(.54, .62, p);
+  if (hub > .01) {
+    const R = Math.min(w * .3, h * .2);
+    const nodes = Array.from({ length: 8 }, (_, i) => { const a = i / 8 * TAU + .3 + Math.sin(t * .4 + i) * .05; return [cx + Math.cos(a) * R * 1.45, cy + Math.sin(a) * R * .8]; });
+    g.save(); g.globalAlpha = hub;
+    nodes.forEach(([x, y], i) => {
+      line(g, cx, cy, x, y, rgba(AC, .22), 1);
+      const u = (t * .45 + i * .13) % 1, k = u < .5 ? u * 2 : 2 - u * 2;
+      pt(g, lerp(cx, x, k), lerp(cy, y, k), 2.3, rgba(u < .5 ? '255,200,120' : AC, .9));
+      dot(g, x, y, 3.2, AC, .85);
+    });
+    g.strokeStyle = rgba('226,234,255', .7); g.lineWidth = 1.5; g.strokeRect(cx - 18, cy - 13, 36, 26); line(g, cx - 10, cy - 4, cx + 10, cy - 4, rgba('226,234,255', .5)); line(g, cx - 10, cy + 4, cx + 10, cy + 4, rgba('226,234,255', .5));
+    txt(g, 'central server', cx, cy + 36, { align: 'center', color: 'rgba(226,234,255,.75)' });
+    txt(g, 'round trip: ' + (110 + Math.round(Math.sin(t * 3) * 25)) + ' ms', cx, cy + 52, { align: 'center', color: rgba('255,200,120', .9), size: 12 });
+    g.restore();
+  }
+  // chassis as the computer
+  if (ch > .01) {
+    const U = Math.min(w * .14, h * .13);
+    const sh = ([x, y]) => [cx + x * U, cy + y * U + U * .1];
+    g.save(); g.globalAlpha = ch;
+    const outline = () => { g.beginPath(); const pts = [[0, -1.7], [1.7, 1.1], [.35, .55], [0, .75], [-.35, .55], [-1.7, 1.1]]; pts.forEach((q, i) => { const s = sh(q); i ? g.lineTo(s[0], s[1]) : g.moveTo(s[0], s[1]); }); g.closePath(); };
+    outline(); g.fillStyle = 'rgba(10,18,8,.95)'; g.fill();
+    g.save(); outline(); g.clip();
+    g.strokeStyle = rgba(AC, .45); g.lineWidth = 1;
+    for (const tr of TRACE) { g.beginPath(); tr.forEach((q, i) => { const s = sh(q); i ? g.lineTo(s[0], s[1]) : g.moveTo(s[0], s[1]); }); g.stroke(); }
+    TRACE.forEach((tr, i) => { const q = sh(along(tr, (t * .3 + i * .21) % 1)); pt(g, q[0], q[1], 1.8, rgba('230,255,190', .95)); });
+    for (const [x, y] of [[0, -.4], [.7, .4], [-.7, .4], [0, .2]]) { const s = sh([x, y]); g.fillStyle = rgba(AC, .25 + .2 * Math.sin(t * 4 + x * 5)); g.fillRect(s[0] - 7, s[1] - 7, 14, 14); g.strokeStyle = rgba(AC, .9); g.strokeRect(s[0] - 7, s[1] - 7, 14, 14); }
+    g.restore();
+    outline(); g.strokeStyle = rgba(AC, .9); g.lineWidth = 1.8; g.stroke();
+    const l1 = sh([1.15, .7]); line(g, l1[0], l1[1], l1[0] + 50, l1[1] - 30, rgba('226,234,255', .5)); txt(g, 'lithography on the wing', l1[0] + 54, l1[1] - 26, { color: 'rgba(226,234,255,.85)', size: 12 });
+    g.restore();
+  }
+  // swarm
+  if (sw > .01) {
+    const sc = clamp(w / 1000, .6, 1.3), N = 130;
+    if (!S.ag || S.sw !== w) { S.sw = w; S.lt = t; S.ag = Array.from({ length: N }, () => ({ x: w * (.3 + .4 * rnd()), y: h * (.14 + .22 * rnd()), vx: (rnd() - .5) * 40, vy: (rnd() - .5) * 40 })); }
+    const dt = clamp(t - S.lt, 0, .05); S.lt = t;
+    const tx0 = cx + Math.sin(t * .35) * w * .22, ty0 = cy + Math.sin(t * .6) * h * .06;
+    const th = ss(.7, .88, p), thx = lerp(w * 1.12, -w * .12, th), thy = cy + Math.sin(th * 5) * 14, thOn = th > .001 && th < .999;
+    const A = S.ag;
+    for (let i = 0; i < N; i++) {
+      const a = A[i]; let sx = 0, sy = 0, ax = 0, ay = 0, mx = 0, my = 0, n = 0;
+      for (let j = 0; j < N; j++) {
+        if (j === i) continue; const b = A[j], dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy;
+        if (d2 < (22 * sc) ** 2) { sx -= dx / (d2 + 1) * 120; sy -= dy / (d2 + 1) * 120; }
+        if (d2 < (80 * sc) ** 2) { ax += b.vx; ay += b.vy; mx += b.x; my += b.y; n++; }
+      }
+      let fx = sx * 1.6, fy = sy * 1.6;
+      if (n) { fx += (ax / n - a.vx) * 1.3 + (mx / n - a.x) * .5; fy += (ay / n - a.vy) * 1.3 + (my / n - a.y) * .5; }
+      fx += (tx0 - a.x) * .35; fy += (ty0 - a.y) * .5;
+      if (thOn) { const dx = a.x - thx, dy = a.y - thy, d = Math.hypot(dx, dy); if (d < 120 * sc) { const k = (1 - d / (120 * sc)) * 900; fx += dx / d * k; fy += dy / d * k; } }
+      if (a.y > h * .46) fy -= (a.y - h * .46) * 6; if (a.y < h * .08) fy += (h * .08 - a.y) * 6;
+      a.vx += fx * dt; a.vy += fy * dt;
+      const sp = Math.hypot(a.vx, a.vy), mn = 55 * sc, mxs = 130 * sc; if (sp > mxs) { a.vx *= mxs / sp; a.vy *= mxs / sp; } else if (sp < mn) { a.vx *= mn / (sp + .01); a.vy *= mn / (sp + .01); }
+    }
+    for (const a of A) { a.x += a.vx * dt; a.y += a.vy * dt; }
+    const links = ss(.58, .7, p) * (1 - ss(.9, .96, p) * .6);
+    if (links > .01) {
+      g.strokeStyle = rgba(AC, .22 * links); g.lineWidth = .8; g.beginPath();
+      for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) { const dx = A[i].x - A[j].x, dy = A[i].y - A[j].y; if (dx * dx + dy * dy < (36 * sc) ** 2) { g.moveTo(A[i].x, A[i].y); g.lineTo(A[j].x, A[j].y); } }
+      g.stroke();
+    }
+    for (const a of A) {
+      const ang = Math.atan2(a.vy, a.vx), s = 4.6 * sc;
+      g.fillStyle = rgba(AC, .95 * sw); g.beginPath(); g.moveTo(a.x + Math.cos(ang) * s * 1.6, a.y + Math.sin(ang) * s * 1.6);
+      g.lineTo(a.x + Math.cos(ang + 2.5) * s, a.y + Math.sin(ang + 2.5) * s); g.lineTo(a.x + Math.cos(ang - 2.5) * s, a.y + Math.sin(ang - 2.5) * s); g.fill();
+    }
+    if (thOn) {
+      const r = 18 * sc + Math.sin(t * 8) * 2; g.strokeStyle = rgba(C.bad, .9); g.lineWidth = 1.6; g.beginPath(); g.arc(thx, thy, r, 0, TAU); g.stroke();
+      g.strokeStyle = rgba(C.bad, .25); g.beginPath(); g.arc(thx, thy, 120 * sc, 0, TAU); g.stroke(); dot(g, thx, thy, 4, C.bad, .9);
+      txt(g, 'threat', thx, thy - r - 8, { align: 'center', color: rgba('255,150,150', .95), size: 12 });
+    }
+    readout(g, w, h, 'Swarm', [[`units  ${N}`, rgba(AC, .95)], ['leaders  0', 'rgba(215,224,250,.7)'], ['external signals  0', 'rgba(215,224,250,.7)']], AC);
+  }
+};
+
+// 6. Finale: five small marks
+scenes.finale = (g, w, h, p, t) => {
+  const cy = h * .3, sp = Math.min(w * .17, 190), U = Math.min(w * .045, h * .05, 30);
+  const items = [C.zep, C.grav, C.ion, C.whisp, C.drone];
+  items.forEach((col, i) => {
+    const a = ss(.06 + .07 * i, .16 + .07 * i, p); if (a <= 0) return;
+    const x = w / 2 + (i - 2) * sp, y = cy;
+    const P = (px, py, pz) => proj(px, py, pz, t * .5 + i, .6, U, x, y);
+    g.save(); g.globalAlpha = a;
+    if (i < 2) { torusWire(g, P, 1.2, .45, col, .85, 14, 7); if (i === 1) for (let k = 0; k < 8; k++) { const q = torusPt(1.2, .2, t * 2 + k * .8, k), s = P(q[0], q[1], q[2]); pt(g, s[0], s[1], 1.5, rgba('255,235,200', .9)); } }
+    else if (i === 2) { g.strokeStyle = rgba(col, .8); g.lineWidth = 1.5; g.strokeRect(x - U * .5, y - U * 1.2, U, U * 1.2); for (let k = 0; k < 6; k++) pt(g, x + Math.sin(k * 3) * U * .3, y + ((t * 40 + k * 14) % (U * 2.2)), 1.6, rgba(col, .9)); }
+    else if (i === 3) { for (let dx = 0; dx < 3; dx++) for (let dy = 0; dy < 3; dy++) for (let dz = 0; dz < 3; dz++) { const s = P((dx - 1) * .7, (dy - 1) * .7, (dz - 1) * .7); pt(g, s[0], s[1], 1.7, rgba(col, .85)); } }
+    else { for (let k = 0; k < 9; k++) { const a2 = t * .8 + k * .7, rr = U * (.4 + (k % 3) * .35), px = x + Math.cos(a2) * rr * 1.2, py = y + Math.sin(a2 * 1.3) * rr * .6; g.fillStyle = rgba(col, .9); g.beginPath(); g.moveTo(px + 5, py); g.lineTo(px - 3, py - 3); g.lineTo(px - 3, py + 3); g.fill(); } }
+    g.restore();
+  });
+  const names = ['zeppelin', 'gravitic', 'ion pod', 'whisps', 'drones'];
+  items.forEach((col, i) => { const a = ss(.1 + .07 * i, .2 + .07 * i, p); if (a > 0) txt(g, names[i], w / 2 + (i - 2) * sp, cy + U * 2.4 + 10, { align: 'center', color: rgba(col, .9 * a), size: w < 520 ? 9 : 12 }); });
+};
+
+// ---------- chapters ----------
+const chapters = [...document.querySelectorAll('.chapter')].map(el => ({
+  el, id: el.dataset.id, name: el.dataset.name, canvas: el.querySelector('canvas'), g: null, w: 0, h: 0, sized: false,
+  cue: el.querySelector('.cue'), p: 0, sp: 0,
+  beats: [...el.querySelectorAll('.beat')].map(b => ({ el: b, a: +b.dataset.a, b: +b.dataset.b })),
+  ac: getComputedStyle(el).getPropertyValue('--ac').trim(),
+}));
+const DPR = Math.min(devicePixelRatio || 1, 2);
+function size(c) {
+  const r = c.canvas.getBoundingClientRect();
+  c.w = r.width; c.h = r.height;
+  c.canvas.width = Math.round(r.width * DPR); c.canvas.height = Math.round(r.height * DPR);
+  c.g = c.canvas.getContext('2d'); c.g.setTransform(DPR, 0, 0, DPR, 0, 0); c.sized = true;
+}
+function unsize(c) { c.canvas.width = c.canvas.height = 1; c.sized = false; }
+addEventListener('resize', () => chapters.forEach(c => { c.sized = false; }));
+
+function beats(c) {
+  const p = c.sp;
+  for (const b of c.beats) {
+    const fin = b.a <= 0 ? 1 : ss(b.a, b.a + .035, p);
+    const fout = b.b >= 1 ? 0 : ss(b.b - .035, b.b, p);
+    const o = fin * (1 - fout);
+    b.el.style.opacity = o.toFixed(3);
+    b.el.style.visibility = o < .01 ? 'hidden' : 'visible';
+    b.el.style.transform = `translateY(${((1 - fin) * 22 - fout * 18).toFixed(1)}px)`;
+  }
+}
+
+// rail
+const rail = document.getElementById('rail');
+chapters.forEach(c => {
+  const b = document.createElement('button');
+  b.style.setProperty('--c', c.ac); b.title = b.ariaLabel = c.name;
+  b.onclick = () => scrollTo({ top: c.el.offsetTop + 2, behavior: STILL ? 'auto' : 'smooth' });
+  rail.appendChild(b); c.btn = b;
+});
+
+// background: stars + chapter tint
+const bg = document.getElementById('bg'), bgg = bg.getContext('2d');
+const stars = Array.from({ length: 170 }, () => ({ x: Math.random(), y: Math.random(), z: .2 + Math.random() * .8, ph: Math.random() * TAU }));
+let tint = [200, 215, 255], tintT = [200, 215, 255];
+function drawBg(T) {
+  const w = innerWidth, h = innerHeight;
+  if (bg.width !== Math.round(w * DPR) || bg.height !== Math.round(h * DPR)) { bg.width = Math.round(w * DPR); bg.height = Math.round(h * DPR); }
+  bgg.setTransform(DPR, 0, 0, DPR, 0, 0); bgg.clearRect(0, 0, w, h);
+  for (let i = 0; i < 3; i++) tint[i] += (tintT[i] - tint[i]) * .05;
+  const gr = bgg.createRadialGradient(w / 2, h * .4, 0, w / 2, h * .4, Math.max(w, h) * .7);
+  gr.addColorStop(0, `rgba(${tint.map(Math.round)},.12)`); gr.addColorStop(1, 'rgba(5,6,10,0)');
+  bgg.fillStyle = gr; bgg.fillRect(0, 0, w, h);
+  for (const s of stars) {
+    const y = ((s.y * h - scrollY * .04 * s.z) % h + h) % h;
+    bgg.fillStyle = `rgba(210,222,255,${(.25 + .35 * Math.sin(T * .8 + s.ph)) * s.z})`;
+    bgg.fillRect(s.x * w, y, s.z * 1.6, s.z * 1.6);
+  }
+}
+
+// auto-scroll: a gentle constant pace; any manual scroll or key press hands control back
+const SPEEDS = [.5, 1, 1.5, 2.5], BASE = 90;
+let auto = false, speedI = 1, acc = 0;
+const playBtn = document.getElementById('auto-play'), speedBtn = document.getElementById('auto-speed');
+function setAuto(on) {
+  auto = on; acc = 0;
+  if (on && scrollY >= document.documentElement.scrollHeight - innerHeight - 2) scrollTo(0, 0);
+  playBtn.textContent = on ? '❚❚ Pause' : '▶ Auto-scroll';
+  playBtn.setAttribute('aria-pressed', on); playBtn.classList.toggle('on', on);
+}
+function setSpeed(d) { speedI = clamp(speedI + d, 0, SPEEDS.length - 1); speedBtn.textContent = SPEEDS[speedI] + '×'; }
+playBtn.onclick = e => { setAuto(!auto); if (e.detail) playBtn.blur(); };
+speedBtn.onclick = e => { speedI = (speedI + 1) % SPEEDS.length; setSpeed(0); if (e.detail) speedBtn.blur(); };
+const stop = () => { if (auto) setAuto(false); };
+addEventListener('wheel', stop, { passive: true });
+addEventListener('touchmove', stop, { passive: true });
+ctl.el.addEventListener('pointerdown', stop);
+addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('button,select,input')) return;
+  if (e.code === 'Space') { e.preventDefault(); setAuto(!auto); }
+  else if (e.key === '+' || e.key === '=') setSpeed(1);
+  else if (e.key === '-') setSpeed(-1);
+  else if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'].includes(e.key)) stop();
+});
+
+const cut = document.getElementById('cut');
+let cutting = false;
+function cutTo(c) {
+  cutting = true; cut.style.opacity = 1;
+  setTimeout(() => {
+    c.sp = c.p = 0; scrollTo(0, c.el.offsetTop); acc = 0;
+    cut.style.opacity = 0;
+    setTimeout(() => { cutting = false; }, 120);
+  }, 240);
+}
+
+let last = performance.now(), T = 0;
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (!RM) T += dt;
+  if (auto && !cutting) {
+    acc += BASE * SPEEDS[speedI] * dt; const d = Math.floor(acc);
+    if (d) { acc -= d; scrollBy(0, d); }
+    if (scrollY >= document.documentElement.scrollHeight - innerHeight - 1) setAuto(false);
+    else {
+      const i = chapters.findIndex(c => c.sized && c.p >= .998);
+      if (i >= 0 && i < chapters.length - 1) cutTo(chapters[i + 1]);
+    }
+  }
+  const vh = innerHeight; let active = chapters[0];
+  for (const c of chapters) {
+    const r = c.el.getBoundingClientRect();
+    if (r.top <= vh * .5 && r.bottom > vh * .5) active = c;
+    const vis = r.bottom > 0 && r.top < vh;
+    if (!vis) { if (c.sized) unsize(c); continue; }
+    if (!c.sized) size(c);
+    c.p = clamp(-r.top / (r.height - vh));
+    c.sp = STILL ? c.p : c.sp + (c.p - c.sp) * (1 - Math.pow(.0004, dt));
+    if (Math.abs(c.p - c.sp) < .0003) c.sp = c.p;
+    beats(c);
+    c.g.clearRect(0, 0, c.w, c.h);
+    scenes[c.id](c.g, c.w, c.h, c.sp, T, c);
+  }
+  tintT = active.ac.split(',').map(Number);
+  chapters.forEach(c => c.btn.classList.toggle('on', c === active));
+  drawBg(T);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
