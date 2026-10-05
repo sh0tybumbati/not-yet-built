@@ -1,11 +1,11 @@
 {
   "collection": "ms_not_yet_built_519ba55a",
   "failed_files": [],
-  "indexed_chunks": 0,
+  "indexed_chunks": 1,
   "indexed_files": 1,
-  "last_completed_at": "2026-10-05T14:48:27.687601Z",
-  "last_started_at": "2026-10-05T14:48:25.568622Z",
-  "last_success_at": "2026-10-05T14:48:27.687601Z",
+  "last_completed_at": "2026-10-05T15:50:19.264038Z",
+  "last_started_at": "2026-10-05T15:50:18.131873Z",
+  "last_success_at": "2026-10-05T15:50:19.264038Z",
   "milvus_uri": "~/.memsearch/milvus.db",
   "operation": "index",
   "paths": [
@@ -14,5 +14,5 @@
   "schema_version": 1,
   "status": "ok",
   "total_files": 1,
-  "updated_at": "2026-10-05T14:48:27.687601Z"
+  "updated_at": "2026-10-05T15:50:19.264038Z"
 }
